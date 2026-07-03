@@ -6,10 +6,7 @@
   <title>Mobilidade Copastur</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
 
     body {
       margin: 0;
@@ -30,7 +27,7 @@
     }
 
     main {
-      max-width: 900px;
+      max-width: 1100px;
       margin: 35px auto;
       padding: 20px;
     }
@@ -39,13 +36,13 @@
       background: white;
       border-radius: 18px;
       padding: 28px;
+      margin-bottom: 25px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     }
 
-    h1 {
+    h1, h2 {
       margin-top: 0;
       color: #24304f;
-      font-size: 26px;
     }
 
     .grid {
@@ -71,20 +68,35 @@
     }
 
     button {
-      margin-top: 24px;
-      width: 100%;
-      padding: 15px;
+      padding: 12px;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       background: linear-gradient(90deg, #00cfd1, #0077b6);
       color: white;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: bold;
       cursor: pointer;
     }
 
-    button:hover {
-      opacity: 0.92;
+    button:hover { opacity: 0.92; }
+
+    .btn-full {
+      margin-top: 24px;
+      width: 100%;
+      padding: 15px;
+    }
+
+    .btn-edit {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .btn-cancelar {
+      background: #6b7280;
+      margin-top: 10px;
+      width: 100%;
+      display: none;
     }
 
     .msg {
@@ -106,14 +118,36 @@
       color: #991b1b;
     }
 
-    @media (max-width: 700px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+    .table-wrap {
+      overflow-x: auto;
+    }
 
-      main {
-        margin: 20px auto;
-      }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    th {
+      background: #24304f;
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 11px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    @media (max-width: 700px) {
+      .grid { grid-template-columns: 1fr; }
+      main { margin: 20px auto; }
     }
   </style>
 </head>
@@ -126,9 +160,11 @@
 
   <main>
     <div class="card">
-      <h1>Cadastro de Clientes</h1>
+      <h1 id="tituloForm">Cadastro de Clientes</h1>
 
       <form id="formCliente">
+        <input type="hidden" id="linha">
+
         <div class="grid">
           <div>
             <label>BKO</label>
@@ -156,10 +192,35 @@
           </div>
         </div>
 
-        <button type="submit">Salvar Cliente</button>
+        <button class="btn-full" type="submit" id="btnSalvar">Salvar Cliente</button>
+        <button class="btn-cancelar" type="button" id="btnCancelar" onclick="cancelarEdicao()">Cancelar Edição</button>
 
         <div id="mensagem" class="msg"></div>
       </form>
+    </div>
+
+    <div class="card">
+      <h2>Clientes Cadastrados</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>BKO</th>
+              <th>Cliente</th>
+              <th>Grupo</th>
+              <th>CNPJ</th>
+              <th>Valor FEE</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="listaClientes">
+            <tr>
+              <td colspan="6">Carregando clientes...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </main>
 
@@ -168,11 +229,16 @@
 
     const form = document.getElementById("formCliente");
     const mensagem = document.getElementById("mensagem");
+    const listaClientes = document.getElementById("listaClientes");
 
     form.addEventListener("submit", async function(e) {
       e.preventDefault();
 
+      const linha = document.getElementById("linha").value;
+
       const dados = {
+        action: linha ? "editar" : "cadastrar",
+        linha: linha,
         bko: document.getElementById("bko").value.trim(),
         cliente: document.getElementById("cliente").value.trim(),
         grupo: document.getElementById("grupo").value.trim(),
@@ -189,8 +255,10 @@
         const retorno = await resposta.json();
 
         if (retorno.success) {
-          mostrarMensagem("Cliente cadastrado com sucesso!", "success");
+          mostrarMensagem(retorno.message, "success");
           form.reset();
+          cancelarEdicao();
+          carregarClientes();
         } else {
           mostrarMensagem("Erro: " + retorno.message, "error");
         }
@@ -200,11 +268,73 @@
       }
     });
 
+    async function carregarClientes() {
+      try {
+        const resposta = await fetch(APP_SCRIPT_URL + "?action=listarClientes");
+        const retorno = await resposta.json();
+
+        if (!retorno.success || !retorno.data.length) {
+          listaClientes.innerHTML = `<tr><td colspan="6">Nenhum cliente cadastrado.</td></tr>`;
+          return;
+        }
+
+        listaClientes.innerHTML = "";
+
+        retorno.data.forEach(item => {
+          const tr = document.createElement("tr");
+
+          tr.innerHTML = `
+            <td>${item.bko}</td>
+            <td>${item.cliente}</td>
+            <td>${item.grupo}</td>
+            <td>${item.cnpj}</td>
+            <td>${item.valorFee}</td>
+            <td>
+              <button class="btn-edit" onclick='editarCliente(${JSON.stringify(item)})'>Editar</button>
+            </td>
+          `;
+
+          listaClientes.appendChild(tr);
+        });
+
+      } catch (erro) {
+        listaClientes.innerHTML = `<tr><td colspan="6">Erro ao carregar clientes.</td></tr>`;
+      }
+    }
+
+    function editarCliente(item) {
+      document.getElementById("linha").value = item.linha;
+      document.getElementById("bko").value = item.bko;
+      document.getElementById("cliente").value = item.cliente;
+      document.getElementById("grupo").value = item.grupo;
+      document.getElementById("cnpj").value = item.cnpj;
+      document.getElementById("valorFee").value = item.valorFee;
+
+      document.getElementById("tituloForm").textContent = "Editar Cliente";
+      document.getElementById("btnSalvar").textContent = "Salvar Alteração";
+      document.getElementById("btnCancelar").style.display = "block";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function cancelarEdicao() {
+      document.getElementById("linha").value = "";
+      document.getElementById("tituloForm").textContent = "Cadastro de Clientes";
+      document.getElementById("btnSalvar").textContent = "Salvar Cliente";
+      document.getElementById("btnCancelar").style.display = "none";
+    }
+
     function mostrarMensagem(texto, tipo) {
       mensagem.textContent = texto;
       mensagem.className = "msg " + tipo;
       mensagem.style.display = "block";
+
+      setTimeout(() => {
+        mensagem.style.display = "none";
+      }, 4000);
     }
+
+    carregarClientes();
   </script>
 
 </body>
