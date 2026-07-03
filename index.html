@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mobilidade Copastur</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    header {
+      background: white;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    header img {
+      max-width: 280px;
+      width: 100%;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 35px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #24304f;
+      font-size: 26px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 6px;
+      display: block;
+      color: #374151;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
+    }
+
+    button {
+      margin-top: 24px;
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #00cfd1, #0077b6);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    .msg {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 10px;
+      display: none;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    @media (max-width: 700px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      main {
+        margin: 20px auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <img src="logo-mobilidade.png" alt="Mobilidade Copastur">
+  </header>
+
+  <main>
+    <div class="card">
+      <h1>Cadastro de Clientes</h1>
+
+      <form id="formCliente">
+        <div class="grid">
+          <div>
+            <label>BKO</label>
+            <input type="text" id="bko" required>
+          </div>
+
+          <div>
+            <label>Cliente</label>
+            <input type="text" id="cliente" required>
+          </div>
+
+          <div>
+            <label>Grupo</label>
+            <input type="text" id="grupo">
+          </div>
+
+          <div>
+            <label>CNPJ</label>
+            <input type="text" id="cnpj" required>
+          </div>
+
+          <div>
+            <label>Valor FEE</label>
+            <input type="text" id="valorFee" required>
+          </div>
+        </div>
+
+        <button type="submit">Salvar Cliente</button>
+
+        <div id="mensagem" class="msg"></div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIW698vVFcDXyPuwqxPDxzDTkrQ6xShQP8NsDF3hTMSABT-ed1VXn85k3CAc-8TJaDtQ/exec";
+
+    const form = document.getElementById("formCliente");
+    const mensagem = document.getElementById("mensagem");
+
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const dados = {
+        bko: document.getElementById("bko").value.trim(),
+        cliente: document.getElementById("cliente").value.trim(),
+        grupo: document.getElementById("grupo").value.trim(),
+        cnpj: document.getElementById("cnpj").value.trim(),
+        valorFee: document.getElementById("valorFee").value.trim()
+      };
+
+      try {
+        const resposta = await fetch(APP_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(dados)
+        });
+
+        const retorno = await resposta.json();
+
+        if (retorno.success) {
+          mostrarMensagem("Cliente cadastrado com sucesso!", "success");
+          form.reset();
+        } else {
+          mostrarMensagem("Erro: " + retorno.message, "error");
+        }
+
+      } catch (erro) {
+        mostrarMensagem("Erro ao conectar com o Apps Script.", "error");
+      }
+    });
+
+    function mostrarMensagem(texto, tipo) {
+      mensagem.textContent = texto;
+      mensagem.className = "msg " + tipo;
+      mensagem.style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
