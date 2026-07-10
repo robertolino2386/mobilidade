@@ -140,9 +140,11 @@
       </div>
       <div class="table-wrap"><table><thead id="cabecalhoBase"></thead><tbody id="corpoBase"><tr><td>Carregando base...</td></tr></tbody></table></div>
       <div class="pagination">
+        <button type="button" id="btnPrimeira" onclick="irParaPagina('primeira')">Primeira</button>
         <button type="button" id="btnAnterior" onclick="mudarPagina(-1)">Anterior</button>
         <span id="infoPagina" class="counter">Página 1</span>
         <button type="button" id="btnProxima" onclick="mudarPagina(1)">Próxima</button>
+        <button type="button" id="btnUltima" onclick="irParaPagina('ultima')">Última</button>
       </div>
     </section>
   </div>
@@ -225,11 +227,14 @@
     try{
       const texto=await arquivo.text();
       const delimitador=detectarDelimitador(texto);
-      let matriz=parseCSV(texto,delimitador).filter(l=>l.some(c=>String(c).trim()!==""));
-      if(!matriz.length) throw new Error("O arquivo está vazio.");
-      if(ehCabecalho(matriz[0])) matriz=matriz.slice(1);
-      linhasCsv=matriz.map(l=>BASE_HEADERS.map((_,i)=>String(l[i]??"").trim()));
-      const invalidas=linhasCsv.filter(l=>l.length!==BASE_HEADERS.length);
+      const matriz=parseCSV(texto,delimitador).filter(l=>l.some(c=>String(c).trim()!==""));
+      if(matriz.length<2) throw new Error("O arquivo precisa possuir cabeçalho e pelo menos um registro.");
+
+      const cabecalhosCsv=matriz[0].map(normalizarCabecalho);
+      validarCabecalhosCsv(cabecalhosCsv);
+      linhasCsv=matriz.slice(1).map(linha=>mapearLinhaCsv(linha,cabecalhosCsv));
+      linhasCsv=linhasCsv.filter(l=>l.some(c=>String(c).trim()!==""));
+
       document.getElementById("totalArquivo").textContent=linhasCsv.length;
       document.getElementById("btnImportar").disabled=linhasCsv.length===0;
       renderizarPrevia(linhasCsv.slice(0,20));
@@ -285,12 +290,90 @@
     const pagina=baseFiltrada.slice(inicio,inicio+itensPorPagina);
     document.getElementById("contadorBase").textContent=`${baseFiltrada.length} registro(s) encontrado(s)`;
     document.getElementById("infoPagina").textContent=`Página ${paginaBase} de ${totalPaginas}`;
+    document.getElementById("btnPrimeira").disabled=paginaBase<=1;
     document.getElementById("btnAnterior").disabled=paginaBase<=1;
     document.getElementById("btnProxima").disabled=paginaBase>=totalPaginas;
+    document.getElementById("btnUltima").disabled=paginaBase>=totalPaginas;
     document.getElementById("corpoBase").innerHTML=pagina.length?pagina.map(l=>"<tr>"+BASE_HEADERS.map((_,i)=>`<td>${escapeHtml(l[i]??"")}</td>`).join("")+"</tr>").join(""):`<tr><td colspan="${BASE_HEADERS.length}">Nenhum registro encontrado.</td></tr>`;
   }
 
-  function mudarPagina(delta){ paginaBase+=delta; renderizarBase(); }
+  function mudarPagina(delta){
+    paginaBase+=delta;
+    renderizarBase();
+  }
+
+  function irParaPagina(destino){
+    const totalPaginas=Math.max(1,Math.ceil(baseFiltrada.length/itensPorPagina));
+    paginaBase=destino==="ultima"?totalPaginas:1;
+    renderizarBase();
+  }
+
+
+  const CSV_ALIASES = {
+    dataCorrida: ["data da solicitacao local", "data da solicitacao (local)", "data da corrida"],
+    colaborador: ["colaborador"],
+    email: ["email", "e-mail"],
+    bko: ["bko"],
+    centroCusto: ["centro de custo"],
+    parceiro: ["fornecedor", "parceiro"],
+    corrida: ["tarifa", "corrida"],
+    origem: ["endereco de partida", "origem"],
+    destino: ["endereco de destino", "destino"],
+    detalhamento: ["detalhamento da despesa campo de preenchimento", "detalhamento da despesa (campo de preenchimento)", "detalhamento da despesa"],
+    valorCorrida: ["valor total em brl", "valor da corrida"],
+    id: ["id unico da corrida no provedor", "id único da corrida no provedor", "id"]
+  };
+
+  function mapearLinhaCsv(linha,cabecalhos){
+    const obter=chave=>{
+      const aliases=CSV_ALIASES[chave].map(normalizarCabecalho);
+      const indice=cabecalhos.findIndex(h=>aliases.includes(h));
+      return indice>=0 ? String(linha[indice]??"").trim() : "";
+    };
+
+    const centroCusto=obter("centroCusto");
+    return [
+      obter("dataCorrida"),
+      obter("colaborador"),
+      obter("email"),
+      "", // GRUPO será preenchido no Apps Script conforme o BKO.
+      "", // EMPRESA será preenchida no Apps Script conforme o BKO.
+      obter("bko"),
+      centroCusto,
+      centroCusto,
+      obter("parceiro"),
+      obter("corrida"),
+      obter("origem"),
+      obter("destino"),
+      obter("detalhamento"),
+      obter("valorCorrida"),
+      obter("id")
+    ];
+  }
+
+  function validarCabecalhosCsv(cabecalhos){
+    const obrigatorios=["dataCorrida","colaborador","email","bko","centroCusto","parceiro","corrida","origem","destino","detalhamento","valorCorrida","id"];
+    const ausentes=obrigatorios.filter(chave=>{
+      const aliases=CSV_ALIASES[chave].map(normalizarCabecalho);
+      return !cabecalhos.some(h=>aliases.includes(h));
+    });
+    if(ausentes.length){
+      const nomes=ausentes.map(chave=>CSV_ALIASES[chave][0]);
+      throw new Error("Colunas não encontradas no CSV: "+nomes.join(", "));
+    }
+  }
+
+  function normalizarCabecalho(valor){
+    return String(valor||"")
+      .replace(/^\uFEFF/,"")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g,"")
+      .replace(/[()]/g," ")
+      .replace(/[_\-]+/g," ")
+      .replace(/\s+/g," ")
+      .toLowerCase()
+      .trim();
+  }
 
   function detectarDelimitador(texto){
     const primeira=(texto.split(/\r?\n/).find(l=>l.trim())||"");
@@ -311,10 +394,6 @@
     if(campo!==""||linha.length){linha.push(campo);linhas.push(linha);} return linhas;
   }
 
-  function ehCabecalho(linha){
-    const normalizada=linha.map(normalizarBusca);
-    return normalizada.includes("data da corrida") || normalizada.includes("colaborador") || normalizada.includes("id");
-  }
 
   async function postJson(dados){
     const resposta=await fetch(APP_SCRIPT_URL,{method:"POST",body:JSON.stringify(dados)});
