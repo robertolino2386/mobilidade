@@ -377,12 +377,12 @@
 
     <section id="telaBase" class="tela">
       <div class="card">
-        <h1>Importar Base de Mobilidade</h1>
+        <h1>Adicionar Arquivo à Base</h1>
 
         <div class="upload-box">
-          <p>Selecione o CSV de mobilidade. O sistema vai converter e preencher a guia <b>Base</b> da coluna A até O.</p>
+          <p>Selecione o CSV de mobilidade. Os novos lançamentos serão acrescentados ao final da guia <b>Base</b>, sem apagar os registros anteriores.</p>
           <input type="file" id="arquivoBase" accept=".csv">
-          <button class="btn-full" id="btnImportar" onclick="importarBase()">Importar Base</button>
+          <button class="btn-full" id="btnImportar" onclick="importarBase()">Adicionar à Base</button>
 
           <div class="progress-area" id="progressArea">
             <div class="progress-bar">
@@ -394,14 +394,14 @@
         </div>
 
         <div class="resumo">
-          <div class="mini-card">Linhas importadas<strong id="totalImportado">0</strong></div>
-          <div class="mini-card">BKOs encontrados<strong id="totalBkoOk">0</strong></div>
-          <div class="mini-card">BKOs não encontrados<strong id="totalBkoErro">0</strong></div>
+          <div class="mini-card">Registros adicionados<strong id="totalImportado">0</strong></div>
+          <div class="mini-card">Duplicados ignorados<strong id="totalBkoOk">0</strong></div>
+          <div class="mini-card">Total na base<strong id="totalBkoErro">0</strong></div>
         </div>
       </div>
 
       <div class="card">
-        <h2>Base Importada</h2>
+        <h2>Base Acumulada</h2>
 
         <div class="preview-topbar">
           <span id="previewResumo">Carregando base...</span>
@@ -653,12 +653,9 @@
         });
 
         const bkosNaoEncontrados = Array.from(bkosNaoEncontradosSet).sort();
-        dadosBaseCompleta = linhasBase;
-        aplicarFiltrosBase();
-        atualizarResumo(linhasBase.length, bkoEncontrado, bkosNaoEncontrados.length);
         setProgress(65);
 
-        mostrarMensagem("mensagemBase", "Enviando dados para a planilha...", "info");
+        mostrarMensagem("mensagemBase", "Comparando IDs e adicionando novos registros...", "info");
 
         const resposta = await fetch(APP_SCRIPT_URL, {
           method: "POST",
@@ -674,13 +671,17 @@
 
         if (retorno.success) {
           await carregarBaseSalva();
-          let textoMensagem = `Base importada com sucesso! Total de linhas: ${retorno.total}.`;
+          atualizarResumo(retorno.adicionados || 0, retorno.duplicados || 0, retorno.totalBase || dadosBaseCompleta.length);
+
+          let textoMensagem = `${retorno.adicionados || 0} registro(s) adicionado(s).`;
+          if (retorno.duplicados) textoMensagem += ` ${retorno.duplicados} duplicado(s) ignorado(s) pelo ID.`;
           if (bkosNaoEncontrados.length) {
             textoMensagem += ` BKOs não encontrados: ${bkosNaoEncontrados.slice(0, 10).join(", ")}${bkosNaoEncontrados.length > 10 ? "..." : ""}`;
             mostrarMensagem("mensagemBase", textoMensagem, "warning");
           } else {
             mostrarMensagem("mensagemBase", textoMensagem, "success");
           }
+          input.value = "";
         } else {
           mostrarMensagem("mensagemBase", "Erro: " + retorno.message, "error");
         }
@@ -807,7 +808,7 @@
 
         dadosBaseCompleta = Array.isArray(retorno.data) ? retorno.data : [];
         aplicarFiltrosBase();
-        atualizarResumo(dadosBaseCompleta.length, "-", "-");
+        document.getElementById("totalBkoErro").textContent = dadosBaseCompleta.length;
       } catch (erro) {
         dadosBaseCompleta = [];
         dadosBaseFiltrada = [];
