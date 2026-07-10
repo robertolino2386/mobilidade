@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mobilidade Copastur</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
@@ -109,6 +108,11 @@
       cursor: pointer;
     }
 
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
     .btn-full {
       margin-top: 24px;
       width: 100%;
@@ -138,10 +142,10 @@
 
     .success { background: #dcfce7; color: #166534; }
     .error { background: #fee2e2; color: #991b1b; }
+    .info { background: #dbeafe; color: #1e40af; }
+    .warning { background: #fef3c7; color: #92400e; }
 
-    .table-wrap {
-      overflow-x: auto;
-    }
+    .table-wrap { overflow-x: auto; }
 
     table {
       width: 100%;
@@ -174,6 +178,47 @@
       background: #f8fcff;
     }
 
+    .resumo {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .mini-card {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .mini-card strong {
+      display: block;
+      font-size: 24px;
+      color: #24304f;
+      margin-top: 6px;
+    }
+
+    .progress-area {
+      display: none;
+      margin-top: 18px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: #e5e7eb;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00cfd1, #0077b6);
+      transition: width 0.3s ease;
+    }
+
     @media (max-width: 800px) {
       body { display: block; }
 
@@ -189,7 +234,7 @@
         padding: 20px;
       }
 
-      .grid { grid-template-columns: 1fr; }
+      .grid, .resumo { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -274,10 +319,23 @@
         <h1>Importar Base de Mobilidade</h1>
 
         <div class="upload-box">
-          <p>Selecione o relatório em Excel ou CSV para alimentar a aba <b>Base</b>.</p>
-          <input type="file" id="arquivoBase" accept=".xlsx,.xls,.csv">
-          <button class="btn-full" onclick="importarBase()">Importar Base</button>
+          <p>Selecione o CSV de mobilidade. O sistema vai converter e preencher a guia <b>Base</b> da coluna A até O.</p>
+          <input type="file" id="arquivoBase" accept=".csv">
+          <button class="btn-full" id="btnImportar" onclick="importarBase()">Importar Base</button>
+
+          <div class="progress-area" id="progressArea">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+
           <div id="mensagemBase" class="msg"></div>
+        </div>
+
+        <div class="resumo">
+          <div class="mini-card">Linhas importadas<strong id="totalImportado">0</strong></div>
+          <div class="mini-card">BKOs encontrados<strong id="totalBkoOk">0</strong></div>
+          <div class="mini-card">BKOs não encontrados<strong id="totalBkoErro">0</strong></div>
         </div>
       </div>
 
@@ -300,15 +358,26 @@
     const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIW698vVFcDXyPuwqxPDxzDTkrQ6xShQP8NsDF3hTMSABT-ed1VXn85k3CAc-8TJaDtQ/exec";
 
     const BASE_HEADERS = [
-      "Data da Corrida", "COLABORADOR", "Email", "GRUPO", "EMPRESA", "BKO",
-      "DEPARTYAMENTO", "CENTRO DE CUSTO", "PARCEIRO", "CORRIDA", "ORIGEM",
-      "DESTINO", "Detalhamento da Despesa", "VALOR DA CORRIDA", "ID",
-      "VALOR A SER COBRADO", "VLR FEE", "TOTAL", "RLOC", "HANDLE", "FATURA",
-      "DATA EMISSÃO", "VCTO", "STATUS FATURA", "Mês Corrida", "Ano Corrida"
+      "Data da Corrida",
+      "COLABORADOR",
+      "Email",
+      "GRUPO",
+      "EMPRESA",
+      "BKO",
+      "DEPARTYAMENTO",
+      "CENTRO DE CUSTO",
+      "PARCEIRO",
+      "CORRIDA",
+      "ORIGEM",
+      "DESTINO",
+      "Detalhamento da Despesa",
+      "VALOR DA CORRIDA",
+      "ID"
     ];
 
     const form = document.getElementById("formCliente");
     const listaClientes = document.getElementById("listaClientes");
+    let clientesCache = [];
 
     function abrirTela(tela) {
       document.querySelectorAll(".tela").forEach(el => el.classList.remove("active"));
@@ -361,21 +430,23 @@
         const retorno = await resposta.json();
 
         if (!retorno.success || !retorno.data.length) {
+          clientesCache = [];
           listaClientes.innerHTML = `<tr><td colspan="6">Nenhum cliente cadastrado.</td></tr>`;
           return;
         }
 
+        clientesCache = retorno.data;
         listaClientes.innerHTML = "";
 
         retorno.data.forEach(item => {
           const tr = document.createElement("tr");
 
           tr.innerHTML = `
-            <td>${item.bko}</td>
-            <td>${item.cliente}</td>
-            <td>${item.grupo}</td>
-            <td>${item.cnpj}</td>
-            <td>${item.valorFee}</td>
+            <td>${escapeHtml(item.bko)}</td>
+            <td>${escapeHtml(item.cliente)}</td>
+            <td>${escapeHtml(item.grupo)}</td>
+            <td>${escapeHtml(item.cnpj)}</td>
+            <td>${escapeHtml(item.valorFee)}</td>
             <td><button class="btn-edit" onclick='editarCliente(${JSON.stringify(item)})'>Editar</button></td>
           `;
 
@@ -383,6 +454,7 @@
         });
 
       } catch (erro) {
+        clientesCache = [];
         listaClientes.innerHTML = `<tr><td colspan="6">Erro ao carregar clientes.</td></tr>`;
       }
     }
@@ -411,75 +483,225 @@
 
     async function importarBase() {
       const input = document.getElementById("arquivoBase");
+      const btn = document.getElementById("btnImportar");
 
       if (!input.files.length) {
-        mostrarMensagem("mensagemBase", "Selecione um arquivo primeiro.", "error");
+        mostrarMensagem("mensagemBase", "Selecione um arquivo CSV primeiro.", "error");
         return;
       }
 
-      const file = input.files[0];
-      const reader = new FileReader();
+      btn.disabled = true;
+      setProgress(10);
+      mostrarMensagem("mensagemBase", "Lendo arquivo...", "info");
 
-      reader.onload = async function(e) {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: "array" });
-          const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+      try {
+        if (!clientesCache.length) {
+          await carregarClientes();
+        }
 
-          const linhas = json.map(row => {
-            return BASE_HEADERS.map(header => row[header] || "");
-          });
+        const texto = await lerArquivoComoTexto(input.files[0]);
+        setProgress(30);
 
-          montarPreview(linhas);
+        const linhasCsv = parseCSV(texto);
+        if (linhasCsv.length < 2) {
+          throw new Error("O CSV não possui dados para importar.");
+        }
 
-          const resposta = await fetch(APP_SCRIPT_URL, {
-            method: "POST",
-            body: JSON.stringify({
-              action: "salvarBase",
-              linhas: linhas
-            })
-          });
+        const headersOriginais = linhasCsv[0].map(h => String(h || "").trim());
+        const dados = linhasCsv.slice(1).filter(linha => linha.some(celula => String(celula || "").trim() !== ""));
+        const indice = criarIndiceHeaders(headersOriginais);
+        const mapaClientes = criarMapaClientes(clientesCache);
 
-          const retorno = await resposta.json();
+        const bkosNaoEncontradosSet = new Set();
+        let bkoEncontrado = 0;
 
-          if (retorno.success) {
-            mostrarMensagem("mensagemBase", `Base importada com sucesso! Total de linhas: ${retorno.total}`, "success");
-          } else {
-            mostrarMensagem("mensagemBase", "Erro: " + retorno.message, "error");
+        const linhasBase = dados.map(linha => {
+          const bko = getValor(linha, indice, "bko");
+          const clienteInfo = mapaClientes[normalizarChave(bko)];
+
+          if (clienteInfo) {
+            bkoEncontrado++;
+          } else if (bko) {
+            bkosNaoEncontradosSet.add(bko);
           }
 
-        } catch (erro) {
-          mostrarMensagem("mensagemBase", "Erro ao importar arquivo. Verifique se as colunas estão com os nomes corretos.", "error");
-        }
-      };
+          return [
+            getValor(linha, indice, "data da solicitacao local"),
+            getValor(linha, indice, "colaborador"),
+            getValor(linha, indice, "e mail"),
+            clienteInfo ? clienteInfo.grupo : "",
+            clienteInfo ? clienteInfo.cliente : "",
+            bko,
+            getValor(linha, indice, "centro de custo"),
+            getValor(linha, indice, "centro de custo"),
+            getValor(linha, indice, "fornecedor"),
+            getValor(linha, indice, "tarifa"),
+            getValor(linha, indice, "endereco de partida"),
+            getValor(linha, indice, "endereco de destino"),
+            getValor(linha, indice, "detalhamento da despesa campo de preenchimento"),
+            getValor(linha, indice, "valor total em brl"),
+            getValor(linha, indice, "id unico da corrida no provedor")
+          ];
+        });
 
-      reader.readAsArrayBuffer(file);
+        const bkosNaoEncontrados = Array.from(bkosNaoEncontradosSet).sort();
+        montarPreview(linhasBase);
+        atualizarResumo(linhasBase.length, bkoEncontrado, bkosNaoEncontrados.length);
+        setProgress(65);
+
+        mostrarMensagem("mensagemBase", "Enviando dados para a planilha...", "info");
+
+        const resposta = await fetch(APP_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "salvarBase",
+            linhas: linhasBase,
+            bkosNaoEncontrados: bkosNaoEncontrados
+          })
+        });
+
+        const retorno = await resposta.json();
+        setProgress(100);
+
+        if (retorno.success) {
+          let textoMensagem = `Base importada com sucesso! Total de linhas: ${retorno.total}.`;
+          if (bkosNaoEncontrados.length) {
+            textoMensagem += ` BKOs não encontrados: ${bkosNaoEncontrados.slice(0, 10).join(", ")}${bkosNaoEncontrados.length > 10 ? "..." : ""}`;
+            mostrarMensagem("mensagemBase", textoMensagem, "warning");
+          } else {
+            mostrarMensagem("mensagemBase", textoMensagem, "success");
+          }
+        } else {
+          mostrarMensagem("mensagemBase", "Erro: " + retorno.message, "error");
+        }
+
+      } catch (erro) {
+        mostrarMensagem("mensagemBase", "Erro ao importar arquivo: " + erro.message, "error");
+        setProgress(0);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function lerArquivoComoTexto(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = () => reject(new Error("Não foi possível ler o arquivo."));
+        reader.readAsText(file, "UTF-8");
+      });
+    }
+
+    function parseCSV(texto) {
+      const linhas = [];
+      let linha = [];
+      let campo = "";
+      let dentroAspas = false;
+      const delimitador = detectarDelimitador(texto);
+
+      for (let i = 0; i < texto.length; i++) {
+        const char = texto[i];
+        const prox = texto[i + 1];
+
+        if (char === '"') {
+          if (dentroAspas && prox === '"') {
+            campo += '"';
+            i++;
+          } else {
+            dentroAspas = !dentroAspas;
+          }
+        } else if (char === delimitador && !dentroAspas) {
+          linha.push(campo);
+          campo = "";
+        } else if ((char === "\n" || char === "\r") && !dentroAspas) {
+          if (char === "\r" && prox === "\n") i++;
+          linha.push(campo);
+          linhas.push(linha);
+          linha = [];
+          campo = "";
+        } else {
+          campo += char;
+        }
+      }
+
+      if (campo !== "" || linha.length) {
+        linha.push(campo);
+        linhas.push(linha);
+      }
+
+      return linhas;
+    }
+
+    function detectarDelimitador(texto) {
+      const primeiraLinha = texto.split(/\r?\n/)[0] || "";
+      const qtdPontoVirgula = (primeiraLinha.match(/;/g) || []).length;
+      const qtdVirgula = (primeiraLinha.match(/,/g) || []).length;
+      return qtdPontoVirgula >= qtdVirgula ? ";" : ",";
+    }
+
+    function criarIndiceHeaders(headers) {
+      const indice = {};
+      headers.forEach((header, posicao) => {
+        indice[normalizarHeader(header)] = posicao;
+      });
+      return indice;
+    }
+
+    function getValor(linha, indice, nomeHeaderNormalizado) {
+      const pos = indice[nomeHeaderNormalizado];
+      if (pos === undefined) return "";
+      return String(linha[pos] || "").trim();
+    }
+
+    function criarMapaClientes(clientes) {
+      const mapa = {};
+      clientes.forEach(cliente => {
+        const chave = normalizarChave(cliente.bko);
+        if (chave) {
+          mapa[chave] = cliente;
+        }
+      });
+      return mapa;
+    }
+
+    function normalizarHeader(texto) {
+      return String(texto || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9]+/g, " ")
+        .trim()
+        .toLowerCase();
+    }
+
+    function normalizarChave(valor) {
+      return String(valor || "").trim().replace(/\.0$/, "");
     }
 
     function montarPreview(linhas) {
       const head = document.getElementById("previewHead");
       const body = document.getElementById("previewBody");
 
-      head.innerHTML = `
-        <tr>
-          ${BASE_HEADERS.map(h => `<th>${h}</th>`).join("")}
-        </tr>
-      `;
-
+      head.innerHTML = `<tr>${BASE_HEADERS.map(h => `<th>${escapeHtml(h)}</th>`).join("")}</tr>`;
       body.innerHTML = "";
 
       linhas.slice(0, 20).forEach(linha => {
-        body.innerHTML += `
-          <tr>
-            ${linha.map(c => `<td>${c}</td>`).join("")}
-          </tr>
-        `;
+        body.innerHTML += `<tr>${linha.map(c => `<td>${escapeHtml(c)}</td>`).join("")}</tr>`;
       });
 
       if (!linhas.length) {
         body.innerHTML = `<tr><td>Nenhuma linha encontrada no arquivo.</td></tr>`;
       }
+    }
+
+    function atualizarResumo(total, bkoOk, bkoErro) {
+      document.getElementById("totalImportado").textContent = total;
+      document.getElementById("totalBkoOk").textContent = bkoOk;
+      document.getElementById("totalBkoErro").textContent = bkoErro;
+    }
+
+    function setProgress(valor) {
+      document.getElementById("progressArea").style.display = valor > 0 ? "block" : "none";
+      document.getElementById("progressFill").style.width = valor + "%";
     }
 
     function mostrarMensagem(id, texto, tipo) {
@@ -488,9 +710,20 @@
       msg.className = "msg " + tipo;
       msg.style.display = "block";
 
-      setTimeout(() => {
-        msg.style.display = "none";
-      }, 5000);
+      if (tipo !== "info") {
+        setTimeout(() => {
+          msg.style.display = "none";
+        }, 9000);
+      }
+    }
+
+    function escapeHtml(valor) {
+      return String(valor || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     carregarClientes();
