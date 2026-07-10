@@ -6,116 +6,137 @@
   <title>Mobilidade Copastur</title>
 
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
 
     body {
       margin: 0;
       background: #f4f7fb;
       color: #1f2937;
-      display: flex;
       min-height: 100vh;
     }
 
-    aside {
-      width: 240px;
+    header {
       background: #24304f;
-      color: white;
-      padding: 24px 18px;
-      position: fixed;
-      height: 100vh;
-      left: 0;
-      top: 0;
+      padding: 22px 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
     }
 
-    aside img {
-      width: 100%;
-      background: white;
+    .header-content {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .logo-box {
+      background: #ffffff;
       border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 28px;
+      padding: 10px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    aside button {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 12px;
-      border: none;
-      border-radius: 10px;
-      background: #35466f;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      text-align: left;
+    .logo-box img {
+      width: 220px;
+      max-width: 100%;
+      display: block;
     }
 
-    aside button.active,
-    aside button:hover {
-      background: linear-gradient(90deg, #00cfd1, #0077b6);
+    .header-text {
+      color: #ffffff;
+    }
+
+    .header-text h1 {
+      margin: 0 0 4px;
+      font-size: 24px;
+    }
+
+    .header-text p {
+      margin: 0;
+      color: #d7e1f4;
+      font-size: 14px;
     }
 
     main {
-      margin-left: 240px;
-      width: calc(100% - 240px);
-      padding: 30px;
+      max-width: 1180px;
+      margin: 32px auto;
+      padding: 0 20px 40px;
     }
 
     .card {
-      background: white;
+      background: #ffffff;
       border-radius: 18px;
       padding: 28px;
-      margin-bottom: 25px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     }
 
-    h1, h2 {
-      margin-top: 0;
+    h2 {
+      margin: 0 0 22px;
       color: #24304f;
+      font-size: 24px;
     }
-
-    .tela { display: none; }
-    .tela.active { display: block; }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 18px;
     }
 
     label {
-      font-weight: bold;
-      font-size: 14px;
-      margin-bottom: 6px;
       display: block;
+      margin-bottom: 7px;
       color: #374151;
+      font-size: 14px;
+      font-weight: 700;
     }
 
     input {
       width: 100%;
       padding: 13px;
-      border-radius: 10px;
       border: 1px solid #d1d5db;
+      border-radius: 10px;
       font-size: 15px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input:focus {
+      border-color: #00a6c8;
+      box-shadow: 0 0 0 3px rgba(0, 166, 200, 0.12);
     }
 
     button {
-      padding: 12px;
       border: none;
       border-radius: 10px;
+      padding: 12px 16px;
       background: linear-gradient(90deg, #00cfd1, #0077b6);
-      color: white;
+      color: #ffffff;
       font-size: 15px;
-      font-weight: bold;
+      font-weight: 700;
       cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
     }
 
     button:disabled {
       opacity: 0.55;
       cursor: not-allowed;
+      transform: none;
     }
 
     .btn-full {
-      margin-top: 24px;
       width: 100%;
+      margin-top: 24px;
       padding: 15px;
     }
 
@@ -125,390 +146,223 @@
     }
 
     .btn-cancelar {
-      background: #6b7280;
-      margin-top: 10px;
       width: 100%;
+      margin-top: 10px;
+      background: #6b7280;
       display: none;
     }
 
     .msg {
+      display: none;
       margin-top: 18px;
       padding: 14px;
       border-radius: 10px;
-      display: none;
-      font-weight: bold;
       text-align: center;
+      font-weight: 700;
     }
 
-    .success { background: #dcfce7; color: #166534; }
-    .error { background: #fee2e2; color: #991b1b; }
-    .info { background: #dbeafe; color: #1e40af; }
-    .warning { background: #fef3c7; color: #92400e; }
+    .success {
+      background: #dcfce7;
+      color: #166534;
+    }
 
-    .table-wrap { overflow-x: auto; }
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .table-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .search-box {
+      width: min(100%, 360px);
+    }
+
+    .counter {
+      color: #4b5563;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
+      margin-top: 12px;
       font-size: 14px;
     }
 
     th {
       background: #24304f;
-      color: white;
+      color: #ffffff;
       padding: 12px;
       text-align: left;
       white-space: nowrap;
     }
 
     td {
-      padding: 11px;
+      padding: 11px 12px;
       border-bottom: 1px solid #e5e7eb;
       white-space: nowrap;
     }
 
-    tr:hover { background: #f9fafb; }
+    tbody tr:hover {
+      background: #f9fafb;
+    }
 
-    .upload-box {
-      border: 2px dashed #00a6c8;
-      border-radius: 16px;
-      padding: 30px;
+    footer {
+      padding: 20px;
       text-align: center;
-      background: #f8fcff;
+      color: #6b7280;
+      font-size: 12px;
     }
 
-    .resumo {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-top: 20px;
-    }
-
-    .mini-card {
-      background: #f8fafc;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 16px;
-    }
-
-    .mini-card strong {
-      display: block;
-      font-size: 24px;
-      color: #24304f;
-      margin-top: 6px;
-    }
-
-    .progress-area {
-      display: none;
-      margin-top: 18px;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 14px;
-      background: #e5e7eb;
-      border-radius: 99px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #00cfd1, #0077b6);
-      transition: width 0.3s ease;
-    }
-
-
-    .preview-topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-      color: #374151;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    .filters-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin: 16px 0 8px;
-    }
-
-    .filters-grid input {
-      padding: 11px;
-      font-size: 14px;
-    }
-
-    .actions-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    .btn-secondary {
-      background: #6b7280;
-      width: auto;
-    }
-
-    .pagination {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    .pagination button {
-      width: auto;
-      padding: 9px 12px;
-      font-size: 13px;
-    }
-
-    .pagination .page-info {
-      padding: 9px 12px;
-      border-radius: 10px;
-      background: #f3f4f6;
-      color: #24304f;
-      font-weight: bold;
-      min-width: 130px;
-      text-align: center;
-    }
-
-    @media (max-width: 800px) {
-      body { display: block; }
-
-      aside {
-        position: relative;
-        width: 100%;
-        height: auto;
+    @media (max-width: 760px) {
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
-      main {
-        margin-left: 0;
-        width: 100%;
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
         padding: 20px;
       }
 
-      .grid, .resumo, .filters-grid { grid-template-columns: 1fr; }
+      .table-topbar {
+        align-items: stretch;
+      }
+
+      .search-box {
+        width: 100%;
+      }
     }
   </style>
 </head>
-
 <body>
-
-  <aside>
-    <img src="logo-mobilidade.png" alt="Mobilidade Copastur">
-
-    <button id="menuClientes" class="active" onclick="abrirTela('clientes')">Clientes</button>
-    <button id="menuBase" onclick="abrirTela('base')">Base</button>
-  </aside>
+  <header>
+    <div class="header-content">
+      <div class="logo-box">
+        <img src="logo-mobilidade.png" alt="Mobilidade Copastur">
+      </div>
+      <div class="header-text">
+        <h1>Gestão de Clientes</h1>
+        <p>Cadastro e manutenção dos clientes do produto Mobilidade.</p>
+      </div>
+    </div>
+  </header>
 
   <main>
+    <section class="card">
+      <h2 id="tituloForm">Cadastro de Clientes</h2>
 
-    <section id="telaClientes" class="tela active">
-      <div class="card">
-        <h1 id="tituloForm">Cadastro de Clientes</h1>
+      <form id="formCliente">
+        <input type="hidden" id="linha">
 
-        <form id="formCliente">
-          <input type="hidden" id="linha">
-
-          <div class="grid">
-            <div>
-              <label>BKO</label>
-              <input type="text" id="bko" required>
-            </div>
-
-            <div>
-              <label>Cliente</label>
-              <input type="text" id="cliente" required>
-            </div>
-
-            <div>
-              <label>Grupo</label>
-              <input type="text" id="grupo">
-            </div>
-
-            <div>
-              <label>CNPJ</label>
-              <input type="text" id="cnpj" required>
-            </div>
-
-            <div>
-              <label>Valor FEE</label>
-              <input type="text" id="valorFee" required>
-            </div>
+        <div class="grid">
+          <div>
+            <label for="bko">BKO</label>
+            <input type="text" id="bko" required>
           </div>
 
-          <button class="btn-full" type="submit" id="btnSalvar">Salvar Cliente</button>
-          <button class="btn-cancelar" type="button" id="btnCancelar" onclick="cancelarEdicao()">Cancelar Edição</button>
+          <div>
+            <label for="cliente">Cliente</label>
+            <input type="text" id="cliente" required>
+          </div>
 
-          <div id="mensagemCliente" class="msg"></div>
-        </form>
-      </div>
+          <div>
+            <label for="grupo">Grupo</label>
+            <input type="text" id="grupo">
+          </div>
 
-      <div class="card">
-        <h2>Clientes Cadastrados</h2>
+          <div>
+            <label for="cnpj">CNPJ</label>
+            <input type="text" id="cnpj" required>
+          </div>
 
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>BKO</th>
-                <th>Cliente</th>
-                <th>Grupo</th>
-                <th>CNPJ</th>
-                <th>Valor FEE</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody id="listaClientes">
-              <tr><td colspan="6">Carregando clientes...</td></tr>
-            </tbody>
-          </table>
+          <div>
+            <label for="valorFee">Valor FEE</label>
+            <input type="text" id="valorFee" required>
+          </div>
         </div>
-      </div>
+
+        <button class="btn-full" type="submit" id="btnSalvar">Salvar Cliente</button>
+        <button class="btn-cancelar" type="button" id="btnCancelar" onclick="cancelarEdicao()">Cancelar Edição</button>
+
+        <div id="mensagemCliente" class="msg"></div>
+      </form>
     </section>
 
-    <section id="telaBase" class="tela">
-      <div class="card">
-        <h1>Adicionar Arquivo à Base</h1>
-
-        <div class="upload-box">
-          <p>Selecione o CSV de mobilidade. Os novos lançamentos serão acrescentados ao final da guia <b>Base</b>, sem apagar os registros anteriores.</p>
-          <input type="file" id="arquivoBase" accept=".csv">
-          <button class="btn-full" id="btnImportar" onclick="importarBase()">Adicionar à Base</button>
-
-          <div class="progress-area" id="progressArea">
-            <div class="progress-bar">
-              <div class="progress-fill" id="progressFill"></div>
-            </div>
-          </div>
-
-          <div id="mensagemBase" class="msg"></div>
+    <section class="card">
+      <div class="table-topbar">
+        <div>
+          <h2 style="margin-bottom: 8px;">Clientes Cadastrados</h2>
+          <div id="contadorClientes" class="counter">Carregando clientes...</div>
         </div>
 
-        <div class="resumo">
-          <div class="mini-card">Registros adicionados<strong id="totalImportado">0</strong></div>
-          <div class="mini-card">Duplicados ignorados<strong id="totalBkoOk">0</strong></div>
-          <div class="mini-card">Total na base<strong id="totalBkoErro">0</strong></div>
+        <div class="search-box">
+          <label for="filtroClientes">Pesquisar</label>
+          <input type="text" id="filtroClientes" placeholder="BKO, cliente, grupo ou CNPJ" oninput="filtrarClientes()">
         </div>
       </div>
 
-      <div class="card">
-        <h2>Base Acumulada</h2>
-
-        <div class="preview-topbar">
-          <span id="previewResumo">Carregando base...</span>
-          <span>20 lançamentos por página</span>
-        </div>
-
-        <div class="filters-grid">
-          <div>
-            <label>Pesquisar por Colaborador</label>
-            <input type="text" id="filtroColaborador" placeholder="Digite o colaborador" oninput="aplicarFiltrosBase()">
-          </div>
-          <div>
-            <label>Pesquisar por Empresa</label>
-            <input type="text" id="filtroEmpresa" placeholder="Digite a empresa" oninput="aplicarFiltrosBase()">
-          </div>
-          <div>
-            <label>Pesquisar por BKO</label>
-            <input type="text" id="filtroBko" placeholder="Digite o BKO" oninput="aplicarFiltrosBase()">
-          </div>
-          <div>
-            <label>Pesquisar por ID da Corrida</label>
-            <input type="text" id="filtroIdCorrida" placeholder="Digite o ID" oninput="aplicarFiltrosBase()">
-          </div>
-        </div>
-
-        <div class="actions-row">
-          <button type="button" class="btn-secondary" onclick="limparFiltrosBase()">Limpar Filtros</button>
-          <button type="button" onclick="carregarBaseSalva()">Atualizar Base</button>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead id="previewHead"></thead>
-            <tbody id="previewBody">
-              <tr><td>Carregando base...</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="pagination" id="previewPaginacao" style="display:none;">
-          <button type="button" id="btnPrimeira" onclick="mudarPaginaPreview(1)">Primeira</button>
-          <button type="button" id="btnAnterior" onclick="mudarPaginaPreview(paginaPreviewAtual - 1)">Anterior</button>
-          <span class="page-info" id="previewPaginaInfo">Página 1 de 1</span>
-          <button type="button" id="btnProxima" onclick="mudarPaginaPreview(paginaPreviewAtual + 1)">Próxima</button>
-          <button type="button" id="btnUltima" onclick="mudarPaginaPreview(totalPaginasPreview)">Última</button>
-        </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>BKO</th>
+              <th>Cliente</th>
+              <th>Grupo</th>
+              <th>CNPJ</th>
+              <th>Valor FEE</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="listaClientes">
+            <tr><td colspan="6">Carregando clientes...</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
-
   </main>
+
+  <footer>Desenvolvido por <strong><em>Roberto Lino</em></strong></footer>
 
   <script>
     const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIW698vVFcDXyPuwqxPDxzDTkrQ6xShQP8NsDF3hTMSABT-ed1VXn85k3CAc-8TJaDtQ/exec";
 
-    const BASE_HEADERS = [
-      "Data da Corrida",
-      "COLABORADOR",
-      "Email",
-      "GRUPO",
-      "EMPRESA",
-      "BKO",
-      "DEPARTYAMENTO",
-      "CENTRO DE CUSTO",
-      "PARCEIRO",
-      "CORRIDA",
-      "ORIGEM",
-      "DESTINO",
-      "Detalhamento da Despesa",
-      "VALOR DA CORRIDA",
-      "ID"
-    ];
-
     const form = document.getElementById("formCliente");
     const listaClientes = document.getElementById("listaClientes");
-    const REGISTROS_POR_PAGINA_PREVIEW = 20;
-    let dadosBaseCompleta = [];
-    let dadosBaseFiltrada = [];
-    let paginaPreviewAtual = 1;
-    let totalPaginasPreview = 1;
+    const btnSalvar = document.getElementById("btnSalvar");
     let clientesCache = [];
 
-    function abrirTela(tela) {
-      document.querySelectorAll(".tela").forEach(el => el.classList.remove("active"));
-      document.querySelectorAll("aside button").forEach(el => el.classList.remove("active"));
-
-      document.getElementById("tela" + tela.charAt(0).toUpperCase() + tela.slice(1)).classList.add("active");
-      document.getElementById("menu" + tela.charAt(0).toUpperCase() + tela.slice(1)).classList.add("active");
-
-      if (tela === "base") {
-        carregarBaseSalva();
-      }
-    }
-
-    form.addEventListener("submit", async function(e) {
-      e.preventDefault();
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
 
       const linha = document.getElementById("linha").value;
-
       const dados = {
         action: linha ? "editarCliente" : "cadastrarCliente",
-        linha: linha,
+        linha,
         bko: document.getElementById("bko").value.trim(),
         cliente: document.getElementById("cliente").value.trim(),
         grupo: document.getElementById("grupo").value.trim(),
         cnpj: document.getElementById("cnpj").value.trim(),
         valorFee: document.getElementById("valorFee").value.trim()
       };
+
+      btnSalvar.disabled = true;
+      btnSalvar.textContent = linha ? "Salvando alteração..." : "Salvando cliente...";
 
       try {
         const resposta = await fetch(APP_SCRIPT_URL, {
@@ -518,62 +372,92 @@
 
         const retorno = await resposta.json();
 
-        if (retorno.success) {
-          mostrarMensagem("mensagemCliente", retorno.message, "success");
-          form.reset();
-          cancelarEdicao();
-          carregarClientes();
-        } else {
-          mostrarMensagem("mensagemCliente", "Erro: " + retorno.message, "error");
+        if (!retorno.success) {
+          throw new Error(retorno.message || "Não foi possível salvar o cliente.");
         }
 
+        mostrarMensagem("mensagemCliente", retorno.message, "success");
+        form.reset();
+        cancelarEdicao();
+        await carregarClientes();
       } catch (erro) {
-        mostrarMensagem("mensagemCliente", "Erro ao conectar com o Apps Script.", "error");
+        mostrarMensagem("mensagemCliente", "Erro: " + erro.message, "error");
+      } finally {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = document.getElementById("linha").value ? "Salvar Alteração" : "Salvar Cliente";
       }
     });
 
     async function carregarClientes() {
+      listaClientes.innerHTML = '<tr><td colspan="6">Carregando clientes...</td></tr>';
+      document.getElementById("contadorClientes").textContent = "Carregando clientes...";
+
       try {
-        const resposta = await fetch(APP_SCRIPT_URL + "?action=listarClientes&_=" + Date.now(), { cache: "no-store" });
-        const retorno = await resposta.json();
-
-        if (!retorno.success || !retorno.data.length) {
-          clientesCache = [];
-          listaClientes.innerHTML = `<tr><td colspan="6">Nenhum cliente cadastrado.</td></tr>`;
-          return;
-        }
-
-        clientesCache = retorno.data;
-        listaClientes.innerHTML = "";
-
-        retorno.data.forEach(item => {
-          const tr = document.createElement("tr");
-
-          tr.innerHTML = `
-            <td>${escapeHtml(item.bko)}</td>
-            <td>${escapeHtml(item.cliente)}</td>
-            <td>${escapeHtml(item.grupo)}</td>
-            <td>${escapeHtml(item.cnpj)}</td>
-            <td>${escapeHtml(item.valorFee)}</td>
-            <td><button class="btn-edit" onclick='editarCliente(${JSON.stringify(item)})'>Editar</button></td>
-          `;
-
-          listaClientes.appendChild(tr);
+        const resposta = await fetch(APP_SCRIPT_URL + "?action=listarClientes&_=" + Date.now(), {
+          cache: "no-store"
         });
 
+        const retorno = await resposta.json();
+
+        if (!retorno.success) {
+          throw new Error(retorno.message || "Não foi possível carregar os clientes.");
+        }
+
+        clientesCache = Array.isArray(retorno.data) ? retorno.data : [];
+        clientesCache.sort((a, b) => String(a.cliente || "").localeCompare(String(b.cliente || ""), "pt-BR"));
+        filtrarClientes();
       } catch (erro) {
         clientesCache = [];
-        listaClientes.innerHTML = `<tr><td colspan="6">Erro ao carregar clientes.</td></tr>`;
+        listaClientes.innerHTML = `<tr><td colspan="6">Erro ao carregar clientes: ${escapeHtml(erro.message)}</td></tr>`;
+        document.getElementById("contadorClientes").textContent = "0 clientes";
       }
     }
 
-    function editarCliente(item) {
+    function filtrarClientes() {
+      const termo = normalizarBusca(document.getElementById("filtroClientes").value);
+
+      const filtrados = clientesCache.filter(item => {
+        const conteudo = [item.bko, item.cliente, item.grupo, item.cnpj, item.valorFee]
+          .map(normalizarBusca)
+          .join(" ");
+        return !termo || conteudo.includes(termo);
+      });
+
+      renderizarClientes(filtrados);
+    }
+
+    function renderizarClientes(clientes) {
+      document.getElementById("contadorClientes").textContent = `${clientes.length} cliente${clientes.length === 1 ? "" : "s"}`;
+
+      if (!clientes.length) {
+        listaClientes.innerHTML = '<tr><td colspan="6">Nenhum cliente encontrado.</td></tr>';
+        return;
+      }
+
+      listaClientes.innerHTML = clientes.map(item => `
+        <tr>
+          <td>${escapeHtml(item.bko)}</td>
+          <td>${escapeHtml(item.cliente)}</td>
+          <td>${escapeHtml(item.grupo)}</td>
+          <td>${escapeHtml(item.cnpj)}</td>
+          <td>${escapeHtml(item.valorFee)}</td>
+          <td>
+            <button class="btn-edit" type="button" onclick="editarClientePorLinha(${Number(item.linha)})">Editar</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function editarClientePorLinha(linha) {
+      const item = clientesCache.find(cliente => Number(cliente.linha) === Number(linha));
+      if (!item) return;
+
       document.getElementById("linha").value = item.linha;
-      document.getElementById("bko").value = item.bko;
-      document.getElementById("cliente").value = item.cliente;
-      document.getElementById("grupo").value = item.grupo;
-      document.getElementById("cnpj").value = item.cnpj;
-      document.getElementById("valorFee").value = item.valorFee;
+      document.getElementById("bko").value = item.bko || "";
+      document.getElementById("cliente").value = item.cliente || "";
+      document.getElementById("grupo").value = item.grupo || "";
+      document.getElementById("cnpj").value = item.cnpj || "";
+      document.getElementById("valorFee").value = item.valorFee || "";
 
       document.getElementById("tituloForm").textContent = "Editar Cliente";
       document.getElementById("btnSalvar").textContent = "Salvar Alteração";
@@ -589,331 +473,23 @@
       document.getElementById("btnCancelar").style.display = "none";
     }
 
-    async function importarBase() {
-      const input = document.getElementById("arquivoBase");
-      const btn = document.getElementById("btnImportar");
+    function mostrarMensagem(id, texto, tipo) {
+      const elemento = document.getElementById(id);
+      elemento.textContent = texto;
+      elemento.className = "msg " + tipo;
+      elemento.style.display = "block";
 
-      if (!input.files.length) {
-        mostrarMensagem("mensagemBase", "Selecione um arquivo CSV primeiro.", "error");
-        return;
-      }
-
-      btn.disabled = true;
-      setProgress(10);
-      mostrarMensagem("mensagemBase", "Lendo arquivo...", "info");
-
-      try {
-        if (!clientesCache.length) {
-          await carregarClientes();
-        }
-
-        const texto = await lerArquivoComoTexto(input.files[0]);
-        setProgress(30);
-
-        const linhasCsv = parseCSV(texto);
-        if (linhasCsv.length < 2) {
-          throw new Error("O CSV não possui dados para importar.");
-        }
-
-        const headersOriginais = linhasCsv[0].map(h => String(h || "").trim());
-        const dados = linhasCsv.slice(1).filter(linha => linha.some(celula => String(celula || "").trim() !== ""));
-        const indice = criarIndiceHeaders(headersOriginais);
-        const mapaClientes = criarMapaClientes(clientesCache);
-
-        const bkosNaoEncontradosSet = new Set();
-        let bkoEncontrado = 0;
-
-        const linhasBase = dados.map(linha => {
-          const bko = getValor(linha, indice, "bko");
-          const clienteInfo = mapaClientes[normalizarChave(bko)];
-
-          if (clienteInfo) {
-            bkoEncontrado++;
-          } else if (bko) {
-            bkosNaoEncontradosSet.add(bko);
-          }
-
-          return [
-            getValor(linha, indice, "data da solicitacao local"),
-            getValor(linha, indice, "colaborador"),
-            getValor(linha, indice, "e mail"),
-            clienteInfo ? clienteInfo.grupo : "",
-            clienteInfo ? clienteInfo.cliente : "",
-            bko,
-            getValor(linha, indice, "centro de custo"),
-            getValor(linha, indice, "centro de custo"),
-            getValor(linha, indice, "fornecedor"),
-            getValor(linha, indice, "tarifa"),
-            getValor(linha, indice, "endereco de partida"),
-            getValor(linha, indice, "endereco de destino"),
-            getValor(linha, indice, "detalhamento da despesa campo de preenchimento"),
-            getValor(linha, indice, "valor total em brl"),
-            getValor(linha, indice, "id unico da corrida no provedor")
-          ];
-        });
-
-        const bkosNaoEncontrados = Array.from(bkosNaoEncontradosSet).sort();
-        setProgress(65);
-
-        mostrarMensagem("mensagemBase", "Comparando IDs e adicionando novos registros...", "info");
-
-        const resposta = await fetch(APP_SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify({
-            action: "salvarBase",
-            linhas: linhasBase,
-            bkosNaoEncontrados: bkosNaoEncontrados
-          })
-        });
-
-        const retorno = await resposta.json();
-        setProgress(100);
-
-        if (retorno.success) {
-          await carregarBaseSalva();
-          atualizarResumo(retorno.adicionados || 0, retorno.duplicados || 0, retorno.totalBase || dadosBaseCompleta.length);
-
-          let textoMensagem = `${retorno.adicionados || 0} registro(s) adicionado(s).`;
-          if (retorno.duplicados) textoMensagem += ` ${retorno.duplicados} duplicado(s) ignorado(s) pelo ID.`;
-          if (bkosNaoEncontrados.length) {
-            textoMensagem += ` BKOs não encontrados: ${bkosNaoEncontrados.slice(0, 10).join(", ")}${bkosNaoEncontrados.length > 10 ? "..." : ""}`;
-            mostrarMensagem("mensagemBase", textoMensagem, "warning");
-          } else {
-            mostrarMensagem("mensagemBase", textoMensagem, "success");
-          }
-          input.value = "";
-        } else {
-          mostrarMensagem("mensagemBase", "Erro: " + retorno.message, "error");
-        }
-
-      } catch (erro) {
-        mostrarMensagem("mensagemBase", "Erro ao importar arquivo: " + erro.message, "error");
-        setProgress(0);
-      } finally {
-        btn.disabled = false;
-      }
-    }
-
-    function lerArquivoComoTexto(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = e => resolve(e.target.result);
-        reader.onerror = () => reject(new Error("Não foi possível ler o arquivo."));
-        reader.readAsText(file, "UTF-8");
-      });
-    }
-
-    function parseCSV(texto) {
-      const linhas = [];
-      let linha = [];
-      let campo = "";
-      let dentroAspas = false;
-      const delimitador = detectarDelimitador(texto);
-
-      for (let i = 0; i < texto.length; i++) {
-        const char = texto[i];
-        const prox = texto[i + 1];
-
-        if (char === '"') {
-          if (dentroAspas && prox === '"') {
-            campo += '"';
-            i++;
-          } else {
-            dentroAspas = !dentroAspas;
-          }
-        } else if (char === delimitador && !dentroAspas) {
-          linha.push(campo);
-          campo = "";
-        } else if ((char === "\n" || char === "\r") && !dentroAspas) {
-          if (char === "\r" && prox === "\n") i++;
-          linha.push(campo);
-          linhas.push(linha);
-          linha = [];
-          campo = "";
-        } else {
-          campo += char;
-        }
-      }
-
-      if (campo !== "" || linha.length) {
-        linha.push(campo);
-        linhas.push(linha);
-      }
-
-      return linhas;
-    }
-
-    function detectarDelimitador(texto) {
-      const primeiraLinha = texto.split(/\r?\n/)[0] || "";
-      const qtdPontoVirgula = (primeiraLinha.match(/;/g) || []).length;
-      const qtdVirgula = (primeiraLinha.match(/,/g) || []).length;
-      return qtdPontoVirgula >= qtdVirgula ? ";" : ",";
-    }
-
-    function criarIndiceHeaders(headers) {
-      const indice = {};
-      headers.forEach((header, posicao) => {
-        indice[normalizarHeader(header)] = posicao;
-      });
-      return indice;
-    }
-
-    function getValor(linha, indice, nomeHeaderNormalizado) {
-      const pos = indice[nomeHeaderNormalizado];
-      if (pos === undefined) return "";
-      return String(linha[pos] || "").trim();
-    }
-
-    function criarMapaClientes(clientes) {
-      const mapa = {};
-      clientes.forEach(cliente => {
-        const chave = normalizarChave(cliente.bko);
-        if (chave) {
-          mapa[chave] = cliente;
-        }
-      });
-      return mapa;
-    }
-
-    function normalizarHeader(texto) {
-      return String(texto || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-zA-Z0-9]+/g, " ")
-        .trim()
-        .toLowerCase();
+      setTimeout(() => {
+        elemento.style.display = "none";
+      }, 6000);
     }
 
     function normalizarBusca(valor) {
       return String(valor || "")
         .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
-        .trim()
-        .toLowerCase();
-    }
-
-    function normalizarChave(valor) {
-      return String(valor || "").trim().replace(/\.0$/, "");
-    }
-
-    async function carregarBaseSalva() {
-      try {
-        document.getElementById("previewResumo").textContent = "Carregando base...";
-        const resposta = await fetch(APP_SCRIPT_URL + "?action=listarBase&_=" + Date.now(), { cache: "no-store" });
-        const retorno = await resposta.json();
-
-        if (!retorno.success) {
-          throw new Error(retorno.message || "Erro ao carregar base.");
-        }
-
-        dadosBaseCompleta = Array.isArray(retorno.data) ? retorno.data : [];
-        aplicarFiltrosBase();
-        document.getElementById("totalBkoErro").textContent = dadosBaseCompleta.length;
-      } catch (erro) {
-        dadosBaseCompleta = [];
-        dadosBaseFiltrada = [];
-        renderizarPaginaPreview();
-        mostrarMensagem("mensagemBase", "Erro ao carregar a base salva: " + erro.message, "error");
-      }
-    }
-
-    function aplicarFiltrosBase() {
-      const filtroColaborador = normalizarBusca(document.getElementById("filtroColaborador")?.value || "");
-      const filtroEmpresa = normalizarBusca(document.getElementById("filtroEmpresa")?.value || "");
-      const filtroBko = normalizarBusca(document.getElementById("filtroBko")?.value || "");
-      const filtroId = normalizarBusca(document.getElementById("filtroIdCorrida")?.value || "");
-
-      dadosBaseFiltrada = dadosBaseCompleta.filter(linha => {
-        const colaborador = normalizarBusca(linha[1]);
-        const empresa = normalizarBusca(linha[4]);
-        const bko = normalizarBusca(linha[5]);
-        const id = normalizarBusca(linha[14]);
-
-        return (!filtroColaborador || colaborador.includes(filtroColaborador)) &&
-               (!filtroEmpresa || empresa.includes(filtroEmpresa)) &&
-               (!filtroBko || bko.includes(filtroBko)) &&
-               (!filtroId || id.includes(filtroId));
-      });
-
-      paginaPreviewAtual = 1;
-      totalPaginasPreview = Math.max(1, Math.ceil(dadosBaseFiltrada.length / REGISTROS_POR_PAGINA_PREVIEW));
-      renderizarPaginaPreview();
-    }
-
-    function limparFiltrosBase() {
-      document.getElementById("filtroColaborador").value = "";
-      document.getElementById("filtroEmpresa").value = "";
-      document.getElementById("filtroBko").value = "";
-      document.getElementById("filtroIdCorrida").value = "";
-      aplicarFiltrosBase();
-    }
-
-    function mudarPaginaPreview(pagina) {
-      const novaPagina = Math.min(Math.max(Number(pagina) || 1, 1), totalPaginasPreview);
-      paginaPreviewAtual = novaPagina;
-      renderizarPaginaPreview();
-    }
-
-    function renderizarPaginaPreview() {
-      const head = document.getElementById("previewHead");
-      const body = document.getElementById("previewBody");
-      const resumo = document.getElementById("previewResumo");
-      const paginacao = document.getElementById("previewPaginacao");
-      const paginaInfo = document.getElementById("previewPaginaInfo");
-
-      head.innerHTML = `<tr>${BASE_HEADERS.map(h => `<th>${escapeHtml(h)}</th>`).join("")}</tr>`;
-      body.innerHTML = "";
-
-      if (!dadosBaseFiltrada.length) {
-        body.innerHTML = `<tr><td colspan="${BASE_HEADERS.length}">Nenhum lançamento encontrado na base.</td></tr>`;
-        resumo.textContent = "Nenhuma base importada ainda.";
-        paginacao.style.display = "none";
-        return;
-      }
-
-      totalPaginasPreview = Math.max(1, Math.ceil(dadosBaseFiltrada.length / REGISTROS_POR_PAGINA_PREVIEW));
-      paginaPreviewAtual = Math.min(Math.max(paginaPreviewAtual, 1), totalPaginasPreview);
-
-      const inicio = (paginaPreviewAtual - 1) * REGISTROS_POR_PAGINA_PREVIEW;
-      const fim = Math.min(inicio + REGISTROS_POR_PAGINA_PREVIEW, dadosBaseFiltrada.length);
-      const paginaLinhas = dadosBaseFiltrada.slice(inicio, fim);
-
-      paginaLinhas.forEach(linha => {
-        body.innerHTML += `<tr>${linha.map(c => `<td>${escapeHtml(c)}</td>`).join("")}</tr>`;
-      });
-
-      resumo.textContent = `Mostrando ${inicio + 1} a ${fim} de ${dadosBaseFiltrada.length} lançamentos | Total geral: ${dadosBaseCompleta.length}`;
-      paginaInfo.textContent = `Página ${paginaPreviewAtual} de ${totalPaginasPreview}`;
-      paginacao.style.display = dadosBaseFiltrada.length > REGISTROS_POR_PAGINA_PREVIEW ? "flex" : "none";
-
-      document.getElementById("btnPrimeira").disabled = paginaPreviewAtual === 1;
-      document.getElementById("btnAnterior").disabled = paginaPreviewAtual === 1;
-      document.getElementById("btnProxima").disabled = paginaPreviewAtual === totalPaginasPreview;
-      document.getElementById("btnUltima").disabled = paginaPreviewAtual === totalPaginasPreview;
-    }
-
-    function atualizarResumo(total, bkoOk, bkoErro) {
-      document.getElementById("totalImportado").textContent = total;
-      document.getElementById("totalBkoOk").textContent = bkoOk;
-      document.getElementById("totalBkoErro").textContent = bkoErro;
-    }
-
-    function setProgress(valor) {
-      document.getElementById("progressArea").style.display = valor > 0 ? "block" : "none";
-      document.getElementById("progressFill").style.width = valor + "%";
-    }
-
-    function mostrarMensagem(id, texto, tipo) {
-      const msg = document.getElementById(id);
-      msg.textContent = texto;
-      msg.className = "msg " + tipo;
-      msg.style.display = "block";
-
-      if (tipo !== "info") {
-        setTimeout(() => {
-          msg.style.display = "none";
-        }, 9000);
-      }
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
     }
 
     function escapeHtml(valor) {
@@ -926,8 +502,6 @@
     }
 
     carregarClientes();
-    carregarBaseSalva();
   </script>
-
 </body>
 </html>
