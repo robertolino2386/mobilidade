@@ -56,29 +56,52 @@
     .pagination { display:flex; justify-content:center; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap; }
     .pagination button { padding:8px 12px; }
     footer { padding:20px; text-align:center; color:#6b7280; font-size:12px; }
+    .app-shell { min-height:100vh; display:flex; }
+    .sidebar { width:270px; background:#24304f; padding:22px 18px; position:fixed; inset:0 auto 0 0; display:flex; flex-direction:column; box-shadow:4px 0 18px rgba(0,0,0,.14); z-index:10; }
+    .sidebar .logo-box { width:100%; margin-bottom:24px; }
+    .sidebar .logo-box img { width:210px; }
+    .sidebar-title { color:#fff; font-size:17px; font-weight:700; margin:0 0 6px; text-align:center; }
+    .sidebar-subtitle { color:#d7e1f4; font-size:12px; line-height:1.45; text-align:center; margin:0 0 24px; }
+    .side-menu { display:flex; flex-direction:column; gap:10px; }
+    .tab-btn { width:100%; min-width:0; text-align:left; background:rgba(255,255,255,.10); color:#fff; border:1px solid rgba(255,255,255,.12); padding:14px 16px; }
+    .tab-btn:hover { background:rgba(255,255,255,.17); }
+    .tab-btn.active { background:linear-gradient(90deg,#00cfd1,#0077b6); color:#fff; border-color:transparent; }
+    .sidebar-footer { margin-top:auto; color:#cbd5e1; font-size:11px; text-align:center; padding-top:22px; }
+    .main-content { width:calc(100% - 270px); margin-left:270px; max-width:none; padding:28px 30px 40px; }
+    .page-heading { margin:0 auto 22px; max-width:1280px; }
+    .page-heading h1 { margin:0 0 5px; color:#24304f; font-size:28px; }
+    .page-heading p { margin:0; color:#64748b; }
+    .tab-content { max-width:1280px; margin:0 auto; }
+    .imports-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; align-items:start; }
+    .imports-grid .card { margin-bottom:0; }
+    .preview-card { margin-top:24px; }
+    @media(max-width:900px){
+      .imports-grid{grid-template-columns:1fr}
+    }
     @media(max-width:760px){
-      .header-content{flex-direction:column;align-items:flex-start}.grid,.summary-grid{grid-template-columns:1fr}.card{padding:20px}.table-topbar{align-items:stretch}.search-box{width:100%}
+      .app-shell{display:block}.sidebar{position:relative;width:100%;inset:auto}.main-content{width:100%;margin-left:0;padding:20px 14px 32px}.side-menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.tab-btn{text-align:center;padding:12px 8px}.grid,.summary-grid{grid-template-columns:1fr}.card{padding:20px}.table-topbar{align-items:stretch}.search-box{width:100%}
     }
   </style>
 </head>
 <body>
-<header>
-  <div class="header-content">
+<div class="app-shell">
+  <aside class="sidebar">
     <div class="logo-box"><img src="logo-mobilidade.png" alt="Mobilidade Copastur"></div>
-    <div class="header-text">
-      <h1>Mobilidade Copastur</h1>
-      <p>Gestão de clientes, base de corridas e IDs Benner.</p>
-    </div>
-  </div>
-</header>
+    <p class="sidebar-title">Mobilidade Copastur</p>
+    <p class="sidebar-subtitle">Gestão de clientes, importações e conferência de IDs Benner.</p>
+    <nav class="side-menu">
+      <button class="tab-btn active" data-tab="clientes" type="button">Clientes</button>
+      <button class="tab-btn" data-tab="importacoes" type="button">Importações</button>
+      <button class="tab-btn" data-tab="relatorio" type="button">Relatório</button>
+    </nav>
+    <div class="sidebar-footer">Desenvolvido por <strong><em>Roberto Lino</em></strong></div>
+  </aside>
 
-<main>
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="clientes" type="button">Clientes</button>
-    <button class="tab-btn" data-tab="base" type="button">Base</button>
-    <button class="tab-btn" data-tab="tokens" type="button">ID Benner</button>
-    <button class="tab-btn" data-tab="relatorio" type="button">Relatório</button>
-  </div>
+  <main class="main-content">
+    <div class="page-heading">
+      <h1 id="tituloPagina">Gestão de Clientes</h1>
+      <p id="subtituloPagina">Cadastro e manutenção dos clientes do produto Mobilidade.</p>
+    </div>
 
   <div id="tab-clientes" class="tab-content active">
     <section class="card">
@@ -109,90 +132,57 @@
     </section>
   </div>
 
-  <div id="tab-base" class="tab-content">
-    <section class="card">
-      <h2>Importar Base CSV</h2>
-      <div class="upload-box">
-        <h3>Selecione o arquivo CSV</h3>
-        <p class="hint">O arquivo será acrescentado ao final da aba <strong>Base</strong>. Nenhum registro existente será apagado.</p>
-        <input type="file" id="arquivoCsv" accept=".csv,text/csv">
-        <div class="upload-actions">
-          <button type="button" id="btnLerCsv">Ler arquivo</button>
-          <button type="button" id="btnImportar" disabled>Importar e acrescentar</button>
-          <button type="button" class="btn-secondary" id="btnLimparArquivo">Limpar seleção</button>
+  <div id="tab-importacoes" class="tab-content">
+    <div class="imports-grid">
+      <section class="card">
+        <h2>Importar Base CSV</h2>
+        <div class="upload-box">
+          <h3>Selecione o arquivo CSV</h3>
+          <p class="hint">O arquivo será acrescentado ao final da aba <strong>Base</strong>. Nenhum registro existente será apagado.</p>
+          <input type="file" id="arquivoCsv" accept=".csv,text/csv">
+          <div class="upload-actions">
+            <button type="button" id="btnLerCsv">Ler arquivo</button>
+            <button type="button" id="btnImportar" disabled>Importar e acrescentar</button>
+            <button type="button" class="btn-secondary" id="btnLimparArquivo">Limpar seleção</button>
+          </div>
         </div>
-      </div>
-      <div class="summary-grid">
-        <div class="summary-card"><strong id="totalArquivo">0</strong><span>linhas no arquivo</span></div>
-        <div class="summary-card"><strong id="totalBase">0</strong><span>registros na planilha</span></div>
-        <div class="summary-card"><strong id="totalColunas">15</strong><span>colunas esperadas</span></div>
-      </div>
-      <div id="mensagemBase" class="msg"></div>
-    </section>
+        <div class="summary-grid">
+          <div class="summary-card"><strong id="totalArquivo">0</strong><span>linhas no arquivo</span></div>
+          <div class="summary-card"><strong id="totalBase">-</strong><span>registros após importar</span></div>
+          <div class="summary-card"><strong id="totalColunas">15</strong><span>colunas esperadas</span></div>
+        </div>
+        <div id="mensagemBase" class="msg"></div>
+      </section>
 
-    <section class="card" id="cardPrevia" style="display:none">
-      <div class="table-topbar"><div><h2 style="margin-bottom:8px">Prévia do arquivo</h2><div id="contadorPrevia" class="counter"></div></div></div>
+      <section class="card">
+        <h2>Importar IDs Benner</h2>
+        <div class="upload-box">
+          <h3>Selecione o arquivo XLSX de tokens</h3>
+          <p class="hint">A primeira aba do Excel será acrescentada ao final da guia <strong>Tokens</strong>. Os registros existentes não serão apagados.</p>
+          <input type="file" id="arquivoTokens" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <div class="upload-actions">
+            <button type="button" id="btnLerTokens">Ler arquivo</button>
+            <button type="button" id="btnImportarTokens" disabled>Importar e acrescentar</button>
+            <button type="button" class="btn-secondary" id="btnLimparTokens">Limpar seleção</button>
+          </div>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-card"><strong id="totalArquivoTokens">0</strong><span>linhas no arquivo</span></div>
+          <div class="summary-card"><strong id="totalTokens">-</strong><span>tokens após importar</span></div>
+          <div class="summary-card"><strong>10</strong><span>colunas esperadas</span></div>
+        </div>
+        <div id="mensagemTokens" class="msg"></div>
+      </section>
+    </div>
+
+    <section class="card preview-card" id="cardPrevia" style="display:none">
+      <div class="table-topbar"><div><h2 style="margin-bottom:8px">Prévia da Base CSV</h2><div id="contadorPrevia" class="counter"></div></div></div>
       <div class="table-wrap"><table><thead id="cabecalhoPrevia"></thead><tbody id="corpoPrevia"></tbody></table></div>
     </section>
 
-    <section class="card">
-      <div class="table-topbar">
-        <div><h2 style="margin-bottom:8px">Base já importada</h2><div id="contadorBase" class="counter">Carregando...</div></div>
-        <div class="search-box"><label for="filtroBase">Pesquisar na Base</label><input type="text" id="filtroBase" placeholder="Colaborador, empresa, BKO, ID..." oninput="filtrarBase()"></div>
-      </div>
-      <div class="table-wrap"><table><thead id="cabecalhoBase"></thead><tbody id="corpoBase"><tr><td>Carregando base...</td></tr></tbody></table></div>
-      <div class="pagination">
-        <button type="button" id="btnPrimeira" onclick="irParaPagina('primeira')">Primeira</button>
-        <button type="button" id="btnAnterior" onclick="mudarPagina(-1)">Anterior</button>
-        <span id="infoPagina" class="counter">Página 1</span>
-        <button type="button" id="btnProxima" onclick="mudarPagina(1)">Próxima</button>
-        <button type="button" id="btnUltima" onclick="irParaPagina('ultima')">Última</button>
-      </div>
-    </section>
-  </div>
-
-
-  <div id="tab-tokens" class="tab-content">
-    <section class="card">
-      <h2>Importar IDs Benner</h2>
-      <div class="upload-box">
-        <h3>Selecione o arquivo XLSX de tokens</h3>
-        <p class="hint">A primeira aba do Excel será lida e acrescentada ao final da guia <strong>Tokens</strong>. Os registros existentes não serão apagados.</p>
-        <input type="file" id="arquivoTokens" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-        <div class="upload-actions">
-          <button type="button" id="btnLerTokens">Ler arquivo</button>
-          <button type="button" id="btnImportarTokens" disabled>Importar e acrescentar</button>
-          <button type="button" class="btn-secondary" id="btnLimparTokens">Limpar seleção</button>
-        </div>
-      </div>
-      <div class="summary-grid">
-        <div class="summary-card"><strong id="totalArquivoTokens">0</strong><span>linhas no arquivo</span></div>
-        <div class="summary-card"><strong id="totalTokens">0</strong><span>tokens na planilha</span></div>
-        <div class="summary-card"><strong>10</strong><span>colunas esperadas</span></div>
-      </div>
-      <div id="mensagemTokens" class="msg"></div>
-    </section>
-
-    <section class="card" id="cardPreviaTokens" style="display:none">
-      <div class="table-topbar">
-        <div><h2 style="margin-bottom:8px">Prévia do arquivo de tokens</h2><div id="contadorPreviaTokens" class="counter"></div></div>
-      </div>
+    <section class="card preview-card" id="cardPreviaTokens" style="display:none">
+      <div class="table-topbar"><div><h2 style="margin-bottom:8px">Prévia dos IDs Benner</h2><div id="contadorPreviaTokens" class="counter"></div></div></div>
       <div class="table-wrap"><table><thead id="cabecalhoPreviaTokens"></thead><tbody id="corpoPreviaTokens"></tbody></table></div>
-    </section>
-
-    <section class="card">
-      <div class="table-topbar">
-        <div><h2 style="margin-bottom:8px">IDs Benner já importados</h2><div id="contadorTokens" class="counter">Carregando...</div></div>
-        <div class="search-box"><label for="filtroTokens">Pesquisar nos Tokens</label><input type="text" id="filtroTokens" placeholder="Token, handle, BKO, cliente, PAX..." oninput="filtrarTokens()"></div>
-      </div>
-      <div class="table-wrap"><table><thead id="cabecalhoTokens"></thead><tbody id="corpoTokens"><tr><td>Carregando tokens...</td></tr></tbody></table></div>
-      <div class="pagination">
-        <button type="button" id="btnPrimeiraTokens" onclick="irParaPaginaTokens('primeira')">Primeira</button>
-        <button type="button" id="btnAnteriorTokens" onclick="mudarPaginaTokens(-1)">Anterior</button>
-        <span id="infoPaginaTokens" class="counter">Página 1</span>
-        <button type="button" id="btnProximaTokens" onclick="mudarPaginaTokens(1)">Próxima</button>
-        <button type="button" id="btnUltimaTokens" onclick="irParaPaginaTokens('ultima')">Última</button>
-      </div>
     </section>
   </div>
 
@@ -233,8 +223,8 @@
     </section>
   </div>
 
-</main>
-<footer>Desenvolvido por <strong><em>Roberto Lino</em></strong></footer>
+  </main>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
@@ -266,8 +256,16 @@
   function abrirAba(nome) {
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === nome));
     document.querySelectorAll(".tab-content").forEach(c => c.classList.toggle("active", c.id === "tab-" + nome));
-    if (nome === "base") carregarBase();
-    if (nome === "tokens") carregarTokens();
+
+    const titulos = {
+      clientes: ["Gestão de Clientes", "Cadastro e manutenção dos clientes do produto Mobilidade."],
+      importacoes: ["Importações", "Envie a Base de corridas e os IDs Benner na mesma tela."],
+      relatorio: ["Relatório", "Comparação dos IDs da Base com os tokens do Benner."]
+    };
+    const atual = titulos[nome] || titulos.clientes;
+    document.getElementById("tituloPagina").textContent = atual[0];
+    document.getElementById("subtituloPagina").textContent = atual[1];
+
     if (nome === "relatorio") carregarRelatorio();
   }
 
@@ -347,7 +345,8 @@
       const retorno=await postJson({action:"salvarBase",linhas:linhasCsv});
       if(!retorno.success) throw new Error(retorno.message||"Falha na importação.");
       mostrarMensagem("mensagemBase",`${retorno.total} registro(s) acrescentado(s). A Base agora possui ${retorno.totalBase} registro(s).`,"success");
-      limparArquivo(false); await carregarBase();
+      document.getElementById("totalBase").textContent=retorno.totalBase ?? "-";
+      limparArquivo(false);
     }catch(erro){ mostrarMensagem("mensagemBase","Erro: "+erro.message,"error"); }
     finally{ btn.textContent="Importar e acrescentar"; btn.disabled=linhasCsv.length===0; }
   }
@@ -481,8 +480,8 @@
       const retorno=await postJson({action:"salvarTokens",linhas:linhasTokens});
       if(!retorno.success) throw new Error(retorno.message||"Falha na importação dos tokens.");
       mostrarMensagem("mensagemTokens",`${retorno.total} token(s) acrescentado(s). A guia Tokens agora possui ${retorno.totalTokens} registro(s).`,"success");
+      document.getElementById("totalTokens").textContent=retorno.totalTokens ?? "-";
       limparArquivoTokens(false);
-      await carregarTokens();
     }catch(erro){
       mostrarMensagem("mensagemTokens","Erro: "+erro.message,"error");
     }finally{
