@@ -232,6 +232,30 @@
       font-weight: bold;
     }
 
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 16px 0 8px;
+    }
+
+    .filters-grid input {
+      padding: 11px;
+      font-size: 14px;
+    }
+
+    .actions-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      width: auto;
+    }
+
     .pagination {
       display: flex;
       align-items: center;
@@ -271,7 +295,7 @@
         padding: 20px;
       }
 
-      .grid, .resumo { grid-template-columns: 1fr; }
+      .grid, .resumo, .filters-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -377,18 +401,42 @@
       </div>
 
       <div class="card">
-        <h2>Prévia da Base</h2>
+        <h2>Base Importada</h2>
 
         <div class="preview-topbar">
-          <span id="previewResumo">Nenhum arquivo importado ainda.</span>
+          <span id="previewResumo">Carregando base...</span>
           <span>20 lançamentos por página</span>
+        </div>
+
+        <div class="filters-grid">
+          <div>
+            <label>Pesquisar por Colaborador</label>
+            <input type="text" id="filtroColaborador" placeholder="Digite o colaborador" oninput="aplicarFiltrosBase()">
+          </div>
+          <div>
+            <label>Pesquisar por Empresa</label>
+            <input type="text" id="filtroEmpresa" placeholder="Digite a empresa" oninput="aplicarFiltrosBase()">
+          </div>
+          <div>
+            <label>Pesquisar por BKO</label>
+            <input type="text" id="filtroBko" placeholder="Digite o BKO" oninput="aplicarFiltrosBase()">
+          </div>
+          <div>
+            <label>Pesquisar por ID da Corrida</label>
+            <input type="text" id="filtroIdCorrida" placeholder="Digite o ID" oninput="aplicarFiltrosBase()">
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button type="button" class="btn-secondary" onclick="limparFiltrosBase()">Limpar Filtros</button>
+          <button type="button" onclick="carregarBaseSalva()">Atualizar Base</button>
         </div>
 
         <div class="table-wrap">
           <table>
             <thead id="previewHead"></thead>
             <tbody id="previewBody">
-              <tr><td>Nenhum arquivo importado ainda.</td></tr>
+              <tr><td>Carregando base...</td></tr>
             </tbody>
           </table>
         </div>
@@ -429,7 +477,8 @@
     const form = document.getElementById("formCliente");
     const listaClientes = document.getElementById("listaClientes");
     const REGISTROS_POR_PAGINA_PREVIEW = 20;
-    let dadosPreviewBase = [];
+    let dadosBaseCompleta = [];
+    let dadosBaseFiltrada = [];
     let paginaPreviewAtual = 1;
     let totalPaginasPreview = 1;
     let clientesCache = [];
@@ -440,6 +489,10 @@
 
       document.getElementById("tela" + tela.charAt(0).toUpperCase() + tela.slice(1)).classList.add("active");
       document.getElementById("menu" + tela.charAt(0).toUpperCase() + tela.slice(1)).classList.add("active");
+
+      if (tela === "base") {
+        carregarBaseSalva();
+      }
     }
 
     form.addEventListener("submit", async function(e) {
@@ -600,7 +653,8 @@
         });
 
         const bkosNaoEncontrados = Array.from(bkosNaoEncontradosSet).sort();
-        montarPreview(linhasBase);
+        dadosBaseCompleta = linhasBase;
+        aplicarFiltrosBase();
         atualizarResumo(linhasBase.length, bkoEncontrado, bkosNaoEncontrados.length);
         setProgress(65);
 
@@ -728,15 +782,68 @@
         .toLowerCase();
     }
 
+    function normalizarBusca(valor) {
+      return String(valor || "")
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .trim()
+        .toLowerCase();
+    }
+
     function normalizarChave(valor) {
       return String(valor || "").trim().replace(/\.0$/, "");
     }
 
-    function montarPreview(linhas) {
-      dadosPreviewBase = Array.isArray(linhas) ? linhas : [];
+    async function carregarBaseSalva() {
+      try {
+        document.getElementById("previewResumo").textContent = "Carregando base...";
+        const resposta = await fetch(APP_SCRIPT_URL + "?action=listarBase");
+        const retorno = await resposta.json();
+
+        if (!retorno.success) {
+          throw new Error(retorno.message || "Erro ao carregar base.");
+        }
+
+        dadosBaseCompleta = Array.isArray(retorno.data) ? retorno.data : [];
+        aplicarFiltrosBase();
+        atualizarResumo(dadosBaseCompleta.length, "-", "-");
+      } catch (erro) {
+        dadosBaseCompleta = [];
+        dadosBaseFiltrada = [];
+        renderizarPaginaPreview();
+        mostrarMensagem("mensagemBase", "Erro ao carregar a base salva: " + erro.message, "error");
+      }
+    }
+
+    function aplicarFiltrosBase() {
+      const filtroColaborador = normalizarBusca(document.getElementById("filtroColaborador")?.value || "");
+      const filtroEmpresa = normalizarBusca(document.getElementById("filtroEmpresa")?.value || "");
+      const filtroBko = normalizarBusca(document.getElementById("filtroBko")?.value || "");
+      const filtroId = normalizarBusca(document.getElementById("filtroIdCorrida")?.value || "");
+
+      dadosBaseFiltrada = dadosBaseCompleta.filter(linha => {
+        const colaborador = normalizarBusca(linha[1]);
+        const empresa = normalizarBusca(linha[4]);
+        const bko = normalizarBusca(linha[5]);
+        const id = normalizarBusca(linha[14]);
+
+        return (!filtroColaborador || colaborador.includes(filtroColaborador)) &&
+               (!filtroEmpresa || empresa.includes(filtroEmpresa)) &&
+               (!filtroBko || bko.includes(filtroBko)) &&
+               (!filtroId || id.includes(filtroId));
+      });
+
       paginaPreviewAtual = 1;
-      totalPaginasPreview = Math.max(1, Math.ceil(dadosPreviewBase.length / REGISTROS_POR_PAGINA_PREVIEW));
+      totalPaginasPreview = Math.max(1, Math.ceil(dadosBaseFiltrada.length / REGISTROS_POR_PAGINA_PREVIEW));
       renderizarPaginaPreview();
+    }
+
+    function limparFiltrosBase() {
+      document.getElementById("filtroColaborador").value = "";
+      document.getElementById("filtroEmpresa").value = "";
+      document.getElementById("filtroBko").value = "";
+      document.getElementById("filtroIdCorrida").value = "";
+      aplicarFiltrosBase();
     }
 
     function mudarPaginaPreview(pagina) {
@@ -755,27 +862,27 @@
       head.innerHTML = `<tr>${BASE_HEADERS.map(h => `<th>${escapeHtml(h)}</th>`).join("")}</tr>`;
       body.innerHTML = "";
 
-      if (!dadosPreviewBase.length) {
-        body.innerHTML = `<tr><td colspan="${BASE_HEADERS.length}">Nenhuma linha encontrada no arquivo.</td></tr>`;
-        resumo.textContent = "Nenhum arquivo importado ainda.";
+      if (!dadosBaseFiltrada.length) {
+        body.innerHTML = `<tr><td colspan="${BASE_HEADERS.length}">Nenhum lançamento encontrado na base.</td></tr>`;
+        resumo.textContent = "Nenhuma base importada ainda.";
         paginacao.style.display = "none";
         return;
       }
 
-      totalPaginasPreview = Math.max(1, Math.ceil(dadosPreviewBase.length / REGISTROS_POR_PAGINA_PREVIEW));
+      totalPaginasPreview = Math.max(1, Math.ceil(dadosBaseFiltrada.length / REGISTROS_POR_PAGINA_PREVIEW));
       paginaPreviewAtual = Math.min(Math.max(paginaPreviewAtual, 1), totalPaginasPreview);
 
       const inicio = (paginaPreviewAtual - 1) * REGISTROS_POR_PAGINA_PREVIEW;
-      const fim = Math.min(inicio + REGISTROS_POR_PAGINA_PREVIEW, dadosPreviewBase.length);
-      const paginaLinhas = dadosPreviewBase.slice(inicio, fim);
+      const fim = Math.min(inicio + REGISTROS_POR_PAGINA_PREVIEW, dadosBaseFiltrada.length);
+      const paginaLinhas = dadosBaseFiltrada.slice(inicio, fim);
 
       paginaLinhas.forEach(linha => {
         body.innerHTML += `<tr>${linha.map(c => `<td>${escapeHtml(c)}</td>`).join("")}</tr>`;
       });
 
-      resumo.textContent = `Mostrando ${inicio + 1} a ${fim} de ${dadosPreviewBase.length} lançamentos`;
+      resumo.textContent = `Mostrando ${inicio + 1} a ${fim} de ${dadosBaseFiltrada.length} lançamentos | Total geral: ${dadosBaseCompleta.length}`;
       paginaInfo.textContent = `Página ${paginaPreviewAtual} de ${totalPaginasPreview}`;
-      paginacao.style.display = dadosPreviewBase.length > REGISTROS_POR_PAGINA_PREVIEW ? "flex" : "none";
+      paginacao.style.display = dadosBaseFiltrada.length > REGISTROS_POR_PAGINA_PREVIEW ? "flex" : "none";
 
       document.getElementById("btnPrimeira").disabled = paginaPreviewAtual === 1;
       document.getElementById("btnAnterior").disabled = paginaPreviewAtual === 1;
@@ -817,6 +924,7 @@
     }
 
     carregarClientes();
+    carregarBaseSalva();
   </script>
 
 </body>
