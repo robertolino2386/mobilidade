@@ -4,504 +4,332 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mobilidade Copastur</title>
-
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: #f4f7fb;
-      color: #1f2937;
-      min-height: 100vh;
-    }
-
-    header {
-      background: #24304f;
-      padding: 22px 24px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    }
-
-    .header-content {
-      max-width: 1180px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
-
-    .logo-box {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 10px 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-box img {
-      width: 220px;
-      max-width: 100%;
-      display: block;
-    }
-
-    .header-text {
-      color: #ffffff;
-    }
-
-    .header-text h1 {
-      margin: 0 0 4px;
-      font-size: 24px;
-    }
-
-    .header-text p {
-      margin: 0;
-      color: #d7e1f4;
-      font-size: 14px;
-    }
-
-    main {
-      max-width: 1180px;
-      margin: 32px auto;
-      padding: 0 20px 40px;
-    }
-
-    .card {
-      background: #ffffff;
-      border-radius: 18px;
-      padding: 28px;
-      margin-bottom: 24px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    }
-
-    h2 {
-      margin: 0 0 22px;
-      color: #24304f;
-      font-size: 24px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 7px;
-      color: #374151;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    input {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      font-size: 15px;
-      outline: none;
-      transition: 0.2s ease;
-    }
-
-    input:focus {
-      border-color: #00a6c8;
-      box-shadow: 0 0 0 3px rgba(0, 166, 200, 0.12);
-    }
-
-    button {
-      border: none;
-      border-radius: 10px;
-      padding: 12px 16px;
-      background: linear-gradient(90deg, #00cfd1, #0077b6);
-      color: #ffffff;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    button:hover {
-      opacity: 0.92;
-      transform: translateY(-1px);
-    }
-
-    button:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-full {
-      width: 100%;
-      margin-top: 24px;
-      padding: 15px;
-    }
-
-    .btn-edit {
-      padding: 8px 12px;
-      font-size: 13px;
-    }
-
-    .btn-cancelar {
-      width: 100%;
-      margin-top: 10px;
-      background: #6b7280;
-      display: none;
-    }
-
-    .msg {
-      display: none;
-      margin-top: 18px;
-      padding: 14px;
-      border-radius: 10px;
-      text-align: center;
-      font-weight: 700;
-    }
-
-    .success {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .error {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .table-topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    .search-box {
-      width: min(100%, 360px);
-    }
-
-    .counter {
-      color: #4b5563;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-      font-size: 14px;
-    }
-
-    th {
-      background: #24304f;
-      color: #ffffff;
-      padding: 12px;
-      text-align: left;
-      white-space: nowrap;
-    }
-
-    td {
-      padding: 11px 12px;
-      border-bottom: 1px solid #e5e7eb;
-      white-space: nowrap;
-    }
-
-    tbody tr:hover {
-      background: #f9fafb;
-    }
-
-    footer {
-      padding: 20px;
-      text-align: center;
-      color: #6b7280;
-      font-size: 12px;
-    }
-
-    @media (max-width: 760px) {
-      .header-content {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .card {
-        padding: 20px;
-      }
-
-      .table-topbar {
-        align-items: stretch;
-      }
-
-      .search-box {
-        width: 100%;
-      }
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { margin: 0; background: #f4f7fb; color: #1f2937; min-height: 100vh; }
+    header { background: #24304f; padding: 22px 24px; box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+    .header-content { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; gap: 18px; }
+    .logo-box { background:#fff; border-radius:14px; padding:10px 14px; display:inline-flex; align-items:center; justify-content:center; }
+    .logo-box img { width:220px; max-width:100%; display:block; }
+    .header-text { color:#fff; }
+    .header-text h1 { margin:0 0 4px; font-size:24px; }
+    .header-text p { margin:0; color:#d7e1f4; font-size:14px; }
+    main { max-width:1280px; margin:24px auto 32px; padding:0 20px 40px; }
+    .tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    .tab-btn { background:#dbe4f0; color:#24304f; min-width:150px; }
+    .tab-btn.active { background:linear-gradient(90deg,#00cfd1,#0077b6); color:#fff; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    .card { background:#fff; border-radius:18px; padding:28px; margin-bottom:24px; box-shadow:0 8px 24px rgba(0,0,0,.08); }
+    h2 { margin:0 0 22px; color:#24304f; font-size:24px; }
+    h3 { margin:0 0 10px; color:#24304f; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    label { display:block; margin-bottom:7px; color:#374151; font-size:14px; font-weight:700; }
+    input { width:100%; padding:13px; border:1px solid #d1d5db; border-radius:10px; font-size:15px; outline:none; transition:.2s; }
+    input:focus { border-color:#00a6c8; box-shadow:0 0 0 3px rgba(0,166,200,.12); }
+    button { border:none; border-radius:10px; padding:12px 16px; background:linear-gradient(90deg,#00cfd1,#0077b6); color:#fff; font-size:15px; font-weight:700; cursor:pointer; transition:.2s; }
+    button:hover { opacity:.92; transform:translateY(-1px); }
+    button:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+    .btn-full { width:100%; margin-top:24px; padding:15px; }
+    .btn-edit { padding:8px 12px; font-size:13px; }
+    .btn-cancelar { width:100%; margin-top:10px; background:#6b7280; display:none; }
+    .btn-secondary { background:#6b7280; }
+    .msg { display:none; margin-top:18px; padding:14px; border-radius:10px; text-align:center; font-weight:700; }
+    .success { background:#dcfce7; color:#166534; }
+    .error { background:#fee2e2; color:#991b1b; }
+    .info { background:#e0f2fe; color:#075985; }
+    .table-topbar { display:flex; justify-content:space-between; align-items:end; gap:16px; flex-wrap:wrap; margin-bottom:12px; }
+    .search-box { width:min(100%,360px); }
+    .counter { color:#4b5563; font-size:14px; font-weight:700; }
+    .table-wrap { overflow:auto; max-height:570px; border:1px solid #e5e7eb; border-radius:12px; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th { position:sticky; top:0; z-index:1; background:#24304f; color:#fff; padding:12px; text-align:left; white-space:nowrap; }
+    td { padding:11px 12px; border-bottom:1px solid #e5e7eb; white-space:nowrap; }
+    tbody tr:hover { background:#f9fafb; }
+    .upload-box { border:2px dashed #9ca3af; border-radius:14px; padding:24px; background:#f8fafc; text-align:center; }
+    .upload-box input { background:#fff; }
+    .upload-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px; }
+    .summary-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:18px; }
+    .summary-card { background:#f1f5f9; border-radius:12px; padding:16px; text-align:center; }
+    .summary-card strong { display:block; font-size:24px; color:#24304f; margin-bottom:4px; }
+    .hint { color:#6b7280; font-size:13px; line-height:1.5; }
+    .pagination { display:flex; justify-content:center; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap; }
+    .pagination button { padding:8px 12px; }
+    footer { padding:20px; text-align:center; color:#6b7280; font-size:12px; }
+    @media(max-width:760px){
+      .header-content{flex-direction:column;align-items:flex-start}.grid,.summary-grid{grid-template-columns:1fr}.card{padding:20px}.table-topbar{align-items:stretch}.search-box{width:100%}
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="header-content">
-      <div class="logo-box">
-        <img src="logo-mobilidade.png" alt="Mobilidade Copastur">
-      </div>
-      <div class="header-text">
-        <h1>Gestão de Clientes</h1>
-        <p>Cadastro e manutenção dos clientes do produto Mobilidade.</p>
-      </div>
+<header>
+  <div class="header-content">
+    <div class="logo-box"><img src="logo-mobilidade.png" alt="Mobilidade Copastur"></div>
+    <div class="header-text">
+      <h1>Mobilidade Copastur</h1>
+      <p>Gestão de clientes e importação acumulativa da base de corridas.</p>
     </div>
-  </header>
+  </div>
+</header>
 
-  <main>
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="clientes" type="button">Clientes</button>
+    <button class="tab-btn" data-tab="base" type="button">Base</button>
+  </div>
+
+  <div id="tab-clientes" class="tab-content active">
     <section class="card">
       <h2 id="tituloForm">Cadastro de Clientes</h2>
-
       <form id="formCliente">
         <input type="hidden" id="linha">
-
         <div class="grid">
-          <div>
-            <label for="bko">BKO</label>
-            <input type="text" id="bko" required>
-          </div>
-
-          <div>
-            <label for="cliente">Cliente</label>
-            <input type="text" id="cliente" required>
-          </div>
-
-          <div>
-            <label for="grupo">Grupo</label>
-            <input type="text" id="grupo">
-          </div>
-
-          <div>
-            <label for="cnpj">CNPJ</label>
-            <input type="text" id="cnpj" required>
-          </div>
-
-          <div>
-            <label for="valorFee">Valor FEE</label>
-            <input type="text" id="valorFee" required>
-          </div>
+          <div><label for="bko">BKO</label><input type="text" id="bko" required></div>
+          <div><label for="cliente">Cliente</label><input type="text" id="cliente" required></div>
+          <div><label for="grupo">Grupo</label><input type="text" id="grupo"></div>
+          <div><label for="cnpj">CNPJ</label><input type="text" id="cnpj" required></div>
+          <div><label for="valorFee">Valor FEE</label><input type="text" id="valorFee" required></div>
         </div>
-
         <button class="btn-full" type="submit" id="btnSalvar">Salvar Cliente</button>
         <button class="btn-cancelar" type="button" id="btnCancelar" onclick="cancelarEdicao()">Cancelar Edição</button>
-
         <div id="mensagemCliente" class="msg"></div>
       </form>
     </section>
 
     <section class="card">
       <div class="table-topbar">
-        <div>
-          <h2 style="margin-bottom: 8px;">Clientes Cadastrados</h2>
-          <div id="contadorClientes" class="counter">Carregando clientes...</div>
-        </div>
-
-        <div class="search-box">
-          <label for="filtroClientes">Pesquisar</label>
-          <input type="text" id="filtroClientes" placeholder="BKO, cliente, grupo ou CNPJ" oninput="filtrarClientes()">
-        </div>
+        <div><h2 style="margin-bottom:8px">Clientes Cadastrados</h2><div id="contadorClientes" class="counter">Carregando clientes...</div></div>
+        <div class="search-box"><label for="filtroClientes">Pesquisar</label><input type="text" id="filtroClientes" placeholder="BKO, cliente, grupo ou CNPJ" oninput="filtrarClientes()"></div>
       </div>
-
       <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>BKO</th>
-              <th>Cliente</th>
-              <th>Grupo</th>
-              <th>CNPJ</th>
-              <th>Valor FEE</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
-          <tbody id="listaClientes">
-            <tr><td colspan="6">Carregando clientes...</td></tr>
-          </tbody>
-        </table>
+        <table><thead><tr><th>BKO</th><th>Cliente</th><th>Grupo</th><th>CNPJ</th><th>Valor FEE</th><th>Ação</th></tr></thead><tbody id="listaClientes"><tr><td colspan="6">Carregando clientes...</td></tr></tbody></table>
       </div>
     </section>
-  </main>
+  </div>
 
-  <footer>Desenvolvido por <strong><em>Roberto Lino</em></strong></footer>
+  <div id="tab-base" class="tab-content">
+    <section class="card">
+      <h2>Importar Base CSV</h2>
+      <div class="upload-box">
+        <h3>Selecione o arquivo CSV</h3>
+        <p class="hint">O arquivo será acrescentado ao final da aba <strong>Base</strong>. Nenhum registro existente será apagado.</p>
+        <input type="file" id="arquivoCsv" accept=".csv,text/csv">
+        <div class="upload-actions">
+          <button type="button" id="btnLerCsv">Ler arquivo</button>
+          <button type="button" id="btnImportar" disabled>Importar e acrescentar</button>
+          <button type="button" class="btn-secondary" id="btnLimparArquivo">Limpar seleção</button>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-card"><strong id="totalArquivo">0</strong><span>linhas no arquivo</span></div>
+        <div class="summary-card"><strong id="totalBase">0</strong><span>registros na planilha</span></div>
+        <div class="summary-card"><strong id="totalColunas">15</strong><span>colunas esperadas</span></div>
+      </div>
+      <div id="mensagemBase" class="msg"></div>
+    </section>
 
-  <script>
-    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIW698vVFcDXyPuwqxPDxzDTkrQ6xShQP8NsDF3hTMSABT-ed1VXn85k3CAc-8TJaDtQ/exec";
+    <section class="card" id="cardPrevia" style="display:none">
+      <div class="table-topbar"><div><h2 style="margin-bottom:8px">Prévia do arquivo</h2><div id="contadorPrevia" class="counter"></div></div></div>
+      <div class="table-wrap"><table><thead id="cabecalhoPrevia"></thead><tbody id="corpoPrevia"></tbody></table></div>
+    </section>
 
-    const form = document.getElementById("formCliente");
-    const listaClientes = document.getElementById("listaClientes");
-    const btnSalvar = document.getElementById("btnSalvar");
-    let clientesCache = [];
+    <section class="card">
+      <div class="table-topbar">
+        <div><h2 style="margin-bottom:8px">Base já importada</h2><div id="contadorBase" class="counter">Carregando...</div></div>
+        <div class="search-box"><label for="filtroBase">Pesquisar na Base</label><input type="text" id="filtroBase" placeholder="Colaborador, empresa, BKO, ID..." oninput="filtrarBase()"></div>
+      </div>
+      <div class="table-wrap"><table><thead id="cabecalhoBase"></thead><tbody id="corpoBase"><tr><td>Carregando base...</td></tr></tbody></table></div>
+      <div class="pagination">
+        <button type="button" id="btnAnterior" onclick="mudarPagina(-1)">Anterior</button>
+        <span id="infoPagina" class="counter">Página 1</span>
+        <button type="button" id="btnProxima" onclick="mudarPagina(1)">Próxima</button>
+      </div>
+    </section>
+  </div>
+</main>
+<footer>Desenvolvido por <strong><em>Roberto Lino</em></strong></footer>
 
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
+<script>
+  const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIW698vVFcDXyPuwqxPDxzDTkrQ6xShQP8NsDF3hTMSABT-ed1VXn85k3CAc-8TJaDtQ/exec";
+  const BASE_HEADERS = ["Data da Corrida","COLABORADOR","Email","GRUPO","EMPRESA","BKO","DEPARTYAMENTO","CENTRO DE CUSTO","PARCEIRO","CORRIDA","ORIGEM","DESTINO","Detalhamento da Despesa","VALOR DA CORRIDA","ID"];
 
-      const linha = document.getElementById("linha").value;
-      const dados = {
-        action: linha ? "editarCliente" : "cadastrarCliente",
-        linha,
-        bko: document.getElementById("bko").value.trim(),
-        cliente: document.getElementById("cliente").value.trim(),
-        grupo: document.getElementById("grupo").value.trim(),
-        cnpj: document.getElementById("cnpj").value.trim(),
-        valorFee: document.getElementById("valorFee").value.trim()
-      };
+  const form = document.getElementById("formCliente");
+  const listaClientes = document.getElementById("listaClientes");
+  const btnSalvar = document.getElementById("btnSalvar");
+  let clientesCache = [];
+  let linhasCsv = [];
+  let baseCache = [];
+  let baseFiltrada = [];
+  let paginaBase = 1;
+  const itensPorPagina = 20;
 
-      btnSalvar.disabled = true;
-      btnSalvar.textContent = linha ? "Salvando alteração..." : "Salvando cliente...";
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => abrirAba(btn.dataset.tab)));
 
-      try {
-        const resposta = await fetch(APP_SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify(dados)
-        });
+  function abrirAba(nome) {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === nome));
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.toggle("active", c.id === "tab-" + nome));
+    if (nome === "base") carregarBase();
+  }
 
-        const retorno = await resposta.json();
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    const linha = document.getElementById("linha").value;
+    const dados = { action: linha ? "editarCliente" : "cadastrarCliente", linha, bko: valor("bko"), cliente: valor("cliente"), grupo: valor("grupo"), cnpj: valor("cnpj"), valorFee: valor("valorFee") };
+    btnSalvar.disabled = true;
+    btnSalvar.textContent = linha ? "Salvando alteração..." : "Salvando cliente...";
+    try {
+      const retorno = await postJson(dados);
+      if (!retorno.success) throw new Error(retorno.message || "Não foi possível salvar o cliente.");
+      mostrarMensagem("mensagemCliente", retorno.message, "success");
+      form.reset(); cancelarEdicao(); await carregarClientes();
+    } catch (erro) { mostrarMensagem("mensagemCliente", "Erro: " + erro.message, "error"); }
+    finally { btnSalvar.disabled = false; btnSalvar.textContent = document.getElementById("linha").value ? "Salvar Alteração" : "Salvar Cliente"; }
+  });
 
-        if (!retorno.success) {
-          throw new Error(retorno.message || "Não foi possível salvar o cliente.");
-        }
-
-        mostrarMensagem("mensagemCliente", retorno.message, "success");
-        form.reset();
-        cancelarEdicao();
-        await carregarClientes();
-      } catch (erro) {
-        mostrarMensagem("mensagemCliente", "Erro: " + erro.message, "error");
-      } finally {
-        btnSalvar.disabled = false;
-        btnSalvar.textContent = document.getElementById("linha").value ? "Salvar Alteração" : "Salvar Cliente";
-      }
-    });
-
-    async function carregarClientes() {
-      listaClientes.innerHTML = '<tr><td colspan="6">Carregando clientes...</td></tr>';
-      document.getElementById("contadorClientes").textContent = "Carregando clientes...";
-
-      try {
-        const resposta = await fetch(APP_SCRIPT_URL + "?action=listarClientes&_=" + Date.now(), {
-          cache: "no-store"
-        });
-
-        const retorno = await resposta.json();
-
-        if (!retorno.success) {
-          throw new Error(retorno.message || "Não foi possível carregar os clientes.");
-        }
-
-        clientesCache = Array.isArray(retorno.data) ? retorno.data : [];
-        clientesCache.sort((a, b) => String(a.cliente || "").localeCompare(String(b.cliente || ""), "pt-BR"));
-        filtrarClientes();
-      } catch (erro) {
-        clientesCache = [];
-        listaClientes.innerHTML = `<tr><td colspan="6">Erro ao carregar clientes: ${escapeHtml(erro.message)}</td></tr>`;
-        document.getElementById("contadorClientes").textContent = "0 clientes";
-      }
+  async function carregarClientes() {
+    listaClientes.innerHTML = '<tr><td colspan="6">Carregando clientes...</td></tr>';
+    try {
+      const retorno = await getJson("listarClientes");
+      if (!retorno.success) throw new Error(retorno.message);
+      clientesCache = Array.isArray(retorno.data) ? retorno.data : [];
+      clientesCache.sort((a,b) => String(a.cliente||"").localeCompare(String(b.cliente||""),"pt-BR"));
+      filtrarClientes();
+    } catch (erro) {
+      clientesCache=[]; listaClientes.innerHTML=`<tr><td colspan="6">Erro ao carregar clientes: ${escapeHtml(erro.message)}</td></tr>`;
+      document.getElementById("contadorClientes").textContent="0 clientes";
     }
+  }
 
-    function filtrarClientes() {
-      const termo = normalizarBusca(document.getElementById("filtroClientes").value);
+  function filtrarClientes(){
+    const termo=normalizarBusca(valor("filtroClientes"));
+    const filtrados=clientesCache.filter(item=>[item.bko,item.cliente,item.grupo,item.cnpj,item.valorFee].map(normalizarBusca).join(" ").includes(termo));
+    document.getElementById("contadorClientes").textContent=`${filtrados.length} cliente${filtrados.length===1?"":"s"}`;
+    listaClientes.innerHTML=filtrados.length?filtrados.map(item=>`<tr><td>${escapeHtml(item.bko)}</td><td>${escapeHtml(item.cliente)}</td><td>${escapeHtml(item.grupo)}</td><td>${escapeHtml(item.cnpj)}</td><td>${escapeHtml(item.valorFee)}</td><td><button class="btn-edit" type="button" onclick="editarClientePorLinha(${Number(item.linha)})">Editar</button></td></tr>`).join(""):'<tr><td colspan="6">Nenhum cliente encontrado.</td></tr>';
+  }
 
-      const filtrados = clientesCache.filter(item => {
-        const conteudo = [item.bko, item.cliente, item.grupo, item.cnpj, item.valorFee]
-          .map(normalizarBusca)
-          .join(" ");
-        return !termo || conteudo.includes(termo);
-      });
+  function editarClientePorLinha(linha){
+    const item=clientesCache.find(c=>Number(c.linha)===Number(linha)); if(!item)return;
+    ["bko","cliente","grupo","cnpj","valorFee"].forEach(id=>document.getElementById(id).value=item[id]||"");
+    document.getElementById("linha").value=item.linha; document.getElementById("tituloForm").textContent="Editar Cliente"; btnSalvar.textContent="Salvar Alteração"; document.getElementById("btnCancelar").style.display="block"; window.scrollTo({top:0,behavior:"smooth"});
+  }
 
-      renderizarClientes(filtrados);
+  function cancelarEdicao(){ document.getElementById("linha").value=""; document.getElementById("tituloForm").textContent="Cadastro de Clientes"; btnSalvar.textContent="Salvar Cliente"; document.getElementById("btnCancelar").style.display="none"; }
+
+  document.getElementById("btnLerCsv").addEventListener("click", lerCsv);
+  document.getElementById("btnImportar").addEventListener("click", importarCsv);
+  document.getElementById("btnLimparArquivo").addEventListener("click", limparArquivo);
+
+  async function lerCsv(){
+    const arquivo=document.getElementById("arquivoCsv").files[0];
+    if(!arquivo){ mostrarMensagem("mensagemBase","Selecione um arquivo CSV.","error"); return; }
+    try{
+      const texto=await arquivo.text();
+      const delimitador=detectarDelimitador(texto);
+      let matriz=parseCSV(texto,delimitador).filter(l=>l.some(c=>String(c).trim()!==""));
+      if(!matriz.length) throw new Error("O arquivo está vazio.");
+      if(ehCabecalho(matriz[0])) matriz=matriz.slice(1);
+      linhasCsv=matriz.map(l=>BASE_HEADERS.map((_,i)=>String(l[i]??"").trim()));
+      const invalidas=linhasCsv.filter(l=>l.length!==BASE_HEADERS.length);
+      document.getElementById("totalArquivo").textContent=linhasCsv.length;
+      document.getElementById("btnImportar").disabled=linhasCsv.length===0;
+      renderizarPrevia(linhasCsv.slice(0,20));
+      mostrarMensagem("mensagemBase",`${linhasCsv.length} linha(s) pronta(s) para importação.`,"info");
+    }catch(erro){ linhasCsv=[]; document.getElementById("btnImportar").disabled=true; mostrarMensagem("mensagemBase","Erro ao ler CSV: "+erro.message,"error"); }
+  }
+
+  async function importarCsv(){
+    if(!linhasCsv.length) return;
+    const btn=document.getElementById("btnImportar"); btn.disabled=true; btn.textContent="Importando...";
+    try{
+      const retorno=await postJson({action:"salvarBase",linhas:linhasCsv});
+      if(!retorno.success) throw new Error(retorno.message||"Falha na importação.");
+      mostrarMensagem("mensagemBase",`${retorno.total} registro(s) acrescentado(s). A Base agora possui ${retorno.totalBase} registro(s).`,"success");
+      limparArquivo(false); await carregarBase();
+    }catch(erro){ mostrarMensagem("mensagemBase","Erro: "+erro.message,"error"); }
+    finally{ btn.textContent="Importar e acrescentar"; btn.disabled=linhasCsv.length===0; }
+  }
+
+  function limparArquivo(limparMensagem=true){
+    document.getElementById("arquivoCsv").value=""; linhasCsv=[]; document.getElementById("totalArquivo").textContent="0"; document.getElementById("btnImportar").disabled=true; document.getElementById("cardPrevia").style.display="none"; if(limparMensagem) document.getElementById("mensagemBase").style.display="none";
+  }
+
+  function renderizarPrevia(linhas){
+    document.getElementById("cardPrevia").style.display="block";
+    document.getElementById("contadorPrevia").textContent=`Exibindo até 20 de ${linhasCsv.length} linha(s)`;
+    document.getElementById("cabecalhoPrevia").innerHTML="<tr>"+BASE_HEADERS.map(h=>`<th>${escapeHtml(h)}</th>`).join("")+"</tr>";
+    document.getElementById("corpoPrevia").innerHTML=linhas.map(l=>"<tr>"+l.map(c=>`<td>${escapeHtml(c)}</td>`).join("")+"</tr>").join("");
+  }
+
+  async function carregarBase(){
+    document.getElementById("contadorBase").textContent="Carregando base...";
+    try{
+      const retorno=await getJson("listarBase");
+      if(!retorno.success) throw new Error(retorno.message||"Não foi possível carregar a Base.");
+      baseCache=Array.isArray(retorno.data)?retorno.data:[];
+      document.getElementById("totalBase").textContent=baseCache.length;
+      document.getElementById("cabecalhoBase").innerHTML="<tr>"+BASE_HEADERS.map(h=>`<th>${escapeHtml(h)}</th>`).join("")+"</tr>";
+      paginaBase=1; filtrarBase();
+    }catch(erro){ baseCache=[]; document.getElementById("totalBase").textContent="0"; document.getElementById("contadorBase").textContent="Erro ao carregar"; document.getElementById("corpoBase").innerHTML=`<tr><td>${escapeHtml(erro.message)}</td></tr>`; }
+  }
+
+  function filtrarBase(){
+    const termo=normalizarBusca(valor("filtroBase"));
+    baseFiltrada=baseCache.filter(l=>l.map(normalizarBusca).join(" ").includes(termo));
+    paginaBase=1; renderizarBase();
+  }
+
+  function renderizarBase(){
+    const totalPaginas=Math.max(1,Math.ceil(baseFiltrada.length/itensPorPagina));
+    paginaBase=Math.min(Math.max(1,paginaBase),totalPaginas);
+    const inicio=(paginaBase-1)*itensPorPagina;
+    const pagina=baseFiltrada.slice(inicio,inicio+itensPorPagina);
+    document.getElementById("contadorBase").textContent=`${baseFiltrada.length} registro(s) encontrado(s)`;
+    document.getElementById("infoPagina").textContent=`Página ${paginaBase} de ${totalPaginas}`;
+    document.getElementById("btnAnterior").disabled=paginaBase<=1;
+    document.getElementById("btnProxima").disabled=paginaBase>=totalPaginas;
+    document.getElementById("corpoBase").innerHTML=pagina.length?pagina.map(l=>"<tr>"+BASE_HEADERS.map((_,i)=>`<td>${escapeHtml(l[i]??"")}</td>`).join("")+"</tr>").join(""):`<tr><td colspan="${BASE_HEADERS.length}">Nenhum registro encontrado.</td></tr>`;
+  }
+
+  function mudarPagina(delta){ paginaBase+=delta; renderizarBase(); }
+
+  function detectarDelimitador(texto){
+    const primeira=(texto.split(/\r?\n/).find(l=>l.trim())||"");
+    const contagem={";":(primeira.match(/;/g)||[]).length,",":(primeira.match(/,/g)||[]).length,"\t":(primeira.match(/\t/g)||[]).length};
+    return Object.entries(contagem).sort((a,b)=>b[1]-a[1])[0][0];
+  }
+
+  function parseCSV(texto,delimitador){
+    const linhas=[]; let linha=[]; let campo=""; let aspas=false;
+    for(let i=0;i<texto.length;i++){
+      const ch=texto[i], prox=texto[i+1];
+      if(ch==='"'&&aspas&&prox==='"'){campo+='"';i++;}
+      else if(ch==='"'){aspas=!aspas;}
+      else if(ch===delimitador&&!aspas){linha.push(campo);campo="";}
+      else if((ch==='\n'||ch==='\r')&&!aspas){ if(ch==='\r'&&prox==='\n')i++; linha.push(campo); linhas.push(linha); linha=[]; campo=""; }
+      else campo+=ch;
     }
+    if(campo!==""||linha.length){linha.push(campo);linhas.push(linha);} return linhas;
+  }
 
-    function renderizarClientes(clientes) {
-      document.getElementById("contadorClientes").textContent = `${clientes.length} cliente${clientes.length === 1 ? "" : "s"}`;
+  function ehCabecalho(linha){
+    const normalizada=linha.map(normalizarBusca);
+    return normalizada.includes("data da corrida") || normalizada.includes("colaborador") || normalizada.includes("id");
+  }
 
-      if (!clientes.length) {
-        listaClientes.innerHTML = '<tr><td colspan="6">Nenhum cliente encontrado.</td></tr>';
-        return;
-      }
+  async function postJson(dados){
+    const resposta=await fetch(APP_SCRIPT_URL,{method:"POST",body:JSON.stringify(dados)});
+    return resposta.json();
+  }
+  async function getJson(action){
+    const resposta=await fetch(`${APP_SCRIPT_URL}?action=${encodeURIComponent(action)}&_=${Date.now()}`,{cache:"no-store"});
+    return resposta.json();
+  }
+  function valor(id){return document.getElementById(id).value.trim();}
+  function mostrarMensagem(id,texto,tipo){const el=document.getElementById(id);el.textContent=texto;el.className="msg "+tipo;el.style.display="block";setTimeout(()=>el.style.display="none",7000);}
+  function normalizarBusca(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();}
+  function escapeHtml(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
 
-      listaClientes.innerHTML = clientes.map(item => `
-        <tr>
-          <td>${escapeHtml(item.bko)}</td>
-          <td>${escapeHtml(item.cliente)}</td>
-          <td>${escapeHtml(item.grupo)}</td>
-          <td>${escapeHtml(item.cnpj)}</td>
-          <td>${escapeHtml(item.valorFee)}</td>
-          <td>
-            <button class="btn-edit" type="button" onclick="editarClientePorLinha(${Number(item.linha)})">Editar</button>
-          </td>
-        </tr>
-      `).join("");
-    }
-
-    function editarClientePorLinha(linha) {
-      const item = clientesCache.find(cliente => Number(cliente.linha) === Number(linha));
-      if (!item) return;
-
-      document.getElementById("linha").value = item.linha;
-      document.getElementById("bko").value = item.bko || "";
-      document.getElementById("cliente").value = item.cliente || "";
-      document.getElementById("grupo").value = item.grupo || "";
-      document.getElementById("cnpj").value = item.cnpj || "";
-      document.getElementById("valorFee").value = item.valorFee || "";
-
-      document.getElementById("tituloForm").textContent = "Editar Cliente";
-      document.getElementById("btnSalvar").textContent = "Salvar Alteração";
-      document.getElementById("btnCancelar").style.display = "block";
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function cancelarEdicao() {
-      document.getElementById("linha").value = "";
-      document.getElementById("tituloForm").textContent = "Cadastro de Clientes";
-      document.getElementById("btnSalvar").textContent = "Salvar Cliente";
-      document.getElementById("btnCancelar").style.display = "none";
-    }
-
-    function mostrarMensagem(id, texto, tipo) {
-      const elemento = document.getElementById(id);
-      elemento.textContent = texto;
-      elemento.className = "msg " + tipo;
-      elemento.style.display = "block";
-
-      setTimeout(() => {
-        elemento.style.display = "none";
-      }, 6000);
-    }
-
-    function normalizarBusca(valor) {
-      return String(valor || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .trim();
-    }
-
-    function escapeHtml(valor) {
-      return String(valor || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    carregarClientes();
-  </script>
+  carregarClientes();
+</script>
 </body>
 </html>
