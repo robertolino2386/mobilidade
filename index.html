@@ -219,6 +219,43 @@
       transition: width 0.3s ease;
     }
 
+
+    .preview-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      color: #374151;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .pagination button {
+      width: auto;
+      padding: 9px 12px;
+      font-size: 13px;
+    }
+
+    .pagination .page-info {
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: #f3f4f6;
+      color: #24304f;
+      font-weight: bold;
+      min-width: 130px;
+      text-align: center;
+    }
+
     @media (max-width: 800px) {
       body { display: block; }
 
@@ -341,6 +378,12 @@
 
       <div class="card">
         <h2>Prévia da Base</h2>
+
+        <div class="preview-topbar">
+          <span id="previewResumo">Nenhum arquivo importado ainda.</span>
+          <span>20 lançamentos por página</span>
+        </div>
+
         <div class="table-wrap">
           <table>
             <thead id="previewHead"></thead>
@@ -348,6 +391,14 @@
               <tr><td>Nenhum arquivo importado ainda.</td></tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="pagination" id="previewPaginacao" style="display:none;">
+          <button type="button" id="btnPrimeira" onclick="mudarPaginaPreview(1)">Primeira</button>
+          <button type="button" id="btnAnterior" onclick="mudarPaginaPreview(paginaPreviewAtual - 1)">Anterior</button>
+          <span class="page-info" id="previewPaginaInfo">Página 1 de 1</span>
+          <button type="button" id="btnProxima" onclick="mudarPaginaPreview(paginaPreviewAtual + 1)">Próxima</button>
+          <button type="button" id="btnUltima" onclick="mudarPaginaPreview(totalPaginasPreview)">Última</button>
         </div>
       </div>
     </section>
@@ -377,6 +428,10 @@
 
     const form = document.getElementById("formCliente");
     const listaClientes = document.getElementById("listaClientes");
+    const REGISTROS_POR_PAGINA_PREVIEW = 20;
+    let dadosPreviewBase = [];
+    let paginaPreviewAtual = 1;
+    let totalPaginasPreview = 1;
     let clientesCache = [];
 
     function abrirTela(tela) {
@@ -678,19 +733,54 @@
     }
 
     function montarPreview(linhas) {
+      dadosPreviewBase = Array.isArray(linhas) ? linhas : [];
+      paginaPreviewAtual = 1;
+      totalPaginasPreview = Math.max(1, Math.ceil(dadosPreviewBase.length / REGISTROS_POR_PAGINA_PREVIEW));
+      renderizarPaginaPreview();
+    }
+
+    function mudarPaginaPreview(pagina) {
+      const novaPagina = Math.min(Math.max(Number(pagina) || 1, 1), totalPaginasPreview);
+      paginaPreviewAtual = novaPagina;
+      renderizarPaginaPreview();
+    }
+
+    function renderizarPaginaPreview() {
       const head = document.getElementById("previewHead");
       const body = document.getElementById("previewBody");
+      const resumo = document.getElementById("previewResumo");
+      const paginacao = document.getElementById("previewPaginacao");
+      const paginaInfo = document.getElementById("previewPaginaInfo");
 
       head.innerHTML = `<tr>${BASE_HEADERS.map(h => `<th>${escapeHtml(h)}</th>`).join("")}</tr>`;
       body.innerHTML = "";
 
-      linhas.slice(0, 20).forEach(linha => {
+      if (!dadosPreviewBase.length) {
+        body.innerHTML = `<tr><td colspan="${BASE_HEADERS.length}">Nenhuma linha encontrada no arquivo.</td></tr>`;
+        resumo.textContent = "Nenhum arquivo importado ainda.";
+        paginacao.style.display = "none";
+        return;
+      }
+
+      totalPaginasPreview = Math.max(1, Math.ceil(dadosPreviewBase.length / REGISTROS_POR_PAGINA_PREVIEW));
+      paginaPreviewAtual = Math.min(Math.max(paginaPreviewAtual, 1), totalPaginasPreview);
+
+      const inicio = (paginaPreviewAtual - 1) * REGISTROS_POR_PAGINA_PREVIEW;
+      const fim = Math.min(inicio + REGISTROS_POR_PAGINA_PREVIEW, dadosPreviewBase.length);
+      const paginaLinhas = dadosPreviewBase.slice(inicio, fim);
+
+      paginaLinhas.forEach(linha => {
         body.innerHTML += `<tr>${linha.map(c => `<td>${escapeHtml(c)}</td>`).join("")}</tr>`;
       });
 
-      if (!linhas.length) {
-        body.innerHTML = `<tr><td>Nenhuma linha encontrada no arquivo.</td></tr>`;
-      }
+      resumo.textContent = `Mostrando ${inicio + 1} a ${fim} de ${dadosPreviewBase.length} lançamentos`;
+      paginaInfo.textContent = `Página ${paginaPreviewAtual} de ${totalPaginasPreview}`;
+      paginacao.style.display = dadosPreviewBase.length > REGISTROS_POR_PAGINA_PREVIEW ? "flex" : "none";
+
+      document.getElementById("btnPrimeira").disabled = paginaPreviewAtual === 1;
+      document.getElementById("btnAnterior").disabled = paginaPreviewAtual === 1;
+      document.getElementById("btnProxima").disabled = paginaPreviewAtual === totalPaginasPreview;
+      document.getElementById("btnUltima").disabled = paginaPreviewAtual === totalPaginasPreview;
     }
 
     function atualizarResumo(total, bkoOk, bkoErro) {
