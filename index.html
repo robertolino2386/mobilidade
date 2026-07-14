@@ -228,9 +228,10 @@
 
   <div id="tab-acordos" class="tab-content">
     <section class="card">
-      <h2>Cadastro de Acordos</h2>
+      <h2 id="tituloFormAcordo">Cadastro de Acordos</h2>
       <p class="hint">Preencha os dados do acordo comercial. As informações serão salvas na guia <strong>Acordos</strong> da planilha.</p>
       <form id="formAcordo">
+        <input type="hidden" id="linhaAcordo">
         <div class="grid">
           <div><label for="acordoBko">BKO</label><input type="text" id="acordoBko" required></div>
           <div><label for="acordoCooperativa">Cooperativa</label><input type="text" id="acordoCooperativa" required></div>
@@ -255,6 +256,7 @@
           <div><label for="acordoCidadesAtendidas">Cidades atendidas</label><textarea id="acordoCidadesAtendidas" placeholder="Informe uma ou mais cidades" required></textarea></div>
         </div>
         <button class="btn-full" type="submit" id="btnSalvarAcordo">Salvar Acordo</button>
+        <button class="btn-cancelar" type="button" id="btnCancelarAcordo" onclick="cancelarEdicaoAcordo()">Cancelar Edição</button>
         <div id="mensagemAcordo" class="msg"></div>
       </form>
     </section>
@@ -264,7 +266,7 @@
         <div><h2 style="margin-bottom:8px">Acordos cadastrados</h2><div id="contadorAcordos" class="counter">Carregando acordos...</div></div>
         <div class="search-box"><label for="filtroAcordos">Pesquisar</label><input type="text" id="filtroAcordos" placeholder="BKO, cooperativa, responsável, CNPJ..." oninput="filtrarAcordos()"></div>
       </div>
-      <div class="table-wrap"><table><thead><tr><th>BKO</th><th>Cooperativa</th><th>Responsável</th><th>CNPJ</th><th>Estado</th><th>Cidade</th><th>Dados para pgto</th><th>Prazo Pgto</th><th>Taxa Fee %</th><th>Taxa Cartão %</th><th>Irá Emitir NF?</th><th>Cidades atendidas</th></tr></thead><tbody id="listaAcordos"><tr><td colspan="12">Carregando acordos...</td></tr></tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>BKO</th><th>Cooperativa</th><th>Responsável</th><th>CNPJ</th><th>Estado</th><th>Cidade</th><th>Dados para pgto</th><th>Prazo Pgto</th><th>Taxa Fee %</th><th>Taxa Cartão %</th><th>Irá Emitir NF?</th><th>Cidades atendidas</th><th>Ação</th></tr></thead><tbody id="listaAcordos"><tr><td colspan="13">Carregando acordos...</td></tr></tbody></table></div>
     </section>
   </div>
 
@@ -660,8 +662,10 @@
   formAcordo.addEventListener("submit", async function(event){
     event.preventDefault();
     const btn=document.getElementById("btnSalvarAcordo");
+    const linha=valor("linhaAcordo");
     const dados={
-      action:"cadastrarAcordo",
+      action:linha ? "editarAcordo" : "cadastrarAcordo",
+      linha,
       bko:valor("acordoBko"),
       cooperativa:valor("acordoCooperativa"),
       responsavel:valor("acordoResponsavel"),
@@ -675,23 +679,25 @@
       emitirNf:valor("acordoEmitirNf"),
       cidadesAtendidas:valor("acordoCidadesAtendidas")
     };
-    btn.disabled=true; btn.textContent="Salvando acordo...";
+    btn.disabled=true;
+    btn.textContent=linha ? "Salvando alteração..." : "Salvando acordo...";
     try{
       const retorno=await postJson(dados);
       if(!retorno.success) throw new Error(retorno.message||"Não foi possível salvar o acordo.");
-      formAcordo.reset();
       mostrarMensagem("mensagemAcordo",retorno.message,"success");
+      cancelarEdicaoAcordo();
       await carregarAcordos();
     }catch(erro){
       mostrarMensagem("mensagemAcordo","Erro: "+erro.message,"error");
     }finally{
-      btn.disabled=false; btn.textContent="Salvar Acordo";
+      btn.disabled=false;
+      btn.textContent=valor("linhaAcordo") ? "Salvar Alteração" : "Salvar Acordo";
     }
   });
 
   async function carregarAcordos(){
     const lista=document.getElementById("listaAcordos");
-    lista.innerHTML='<tr><td colspan="12">Carregando acordos...</td></tr>';
+    lista.innerHTML='<tr><td colspan="13">Carregando acordos...</td></tr>';
     document.getElementById("contadorAcordos").textContent="Carregando acordos...";
     try{
       const retorno=await getJson("listarAcordos");
@@ -700,7 +706,7 @@
       filtrarAcordos();
     }catch(erro){
       acordosCache=[];
-      lista.innerHTML=`<tr><td colspan="12">${escapeHtml(erro.message)}</td></tr>`;
+      lista.innerHTML=`<tr><td colspan="13">${escapeHtml(erro.message)}</td></tr>`;
       document.getElementById("contadorAcordos").textContent="0 acordos";
     }
   }
@@ -713,7 +719,46 @@
       <td>${escapeHtml(item.bko)}</td><td>${escapeHtml(item.cooperativa)}</td><td>${escapeHtml(item.responsavel)}</td><td>${escapeHtml(item.cnpj)}</td>
       <td>${escapeHtml(item.estado)}</td><td>${escapeHtml(item.cidade)}</td><td>${escapeHtml(item.dadosPgto)}</td><td>${escapeHtml(item.prazoPgto)}</td>
       <td>${escapeHtml(item.taxaFee)}</td><td>${escapeHtml(item.taxaCartao)}</td><td>${escapeHtml(item.emitirNf)}</td><td>${escapeHtml(item.cidadesAtendidas)}</td>
-    </tr>`).join(""):'<tr><td colspan="12">Nenhum acordo encontrado.</td></tr>';
+      <td><button class="btn-edit" type="button" onclick="editarAcordoPorLinha(${Number(item.linha)})">Editar</button></td>
+    </tr>`).join(""):'<tr><td colspan="13">Nenhum acordo encontrado.</td></tr>';
+  }
+
+  function editarAcordoPorLinha(linha){
+    const item=acordosCache.find(acordo=>Number(acordo.linha)===Number(linha));
+    if(!item) return;
+
+    const campos={
+      linhaAcordo:item.linha,
+      acordoBko:item.bko,
+      acordoCooperativa:item.cooperativa,
+      acordoResponsavel:item.responsavel,
+      acordoCnpj:item.cnpj,
+      acordoEstado:item.estado,
+      acordoCidade:item.cidade,
+      acordoDadosPgto:item.dadosPgto,
+      acordoPrazoPgto:item.prazoPgto,
+      acordoTaxaFee:item.taxaFee,
+      acordoTaxaCartao:item.taxaCartao,
+      acordoEmitirNf:item.emitirNf,
+      acordoCidadesAtendidas:item.cidadesAtendidas
+    };
+
+    Object.entries(campos).forEach(([id,conteudo])=>{
+      document.getElementById(id).value=conteudo||"";
+    });
+
+    document.getElementById("tituloFormAcordo").textContent="Editar Acordo";
+    document.getElementById("btnSalvarAcordo").textContent="Salvar Alteração";
+    document.getElementById("btnCancelarAcordo").style.display="block";
+    document.getElementById("formAcordo").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+
+  function cancelarEdicaoAcordo(){
+    formAcordo.reset();
+    document.getElementById("linhaAcordo").value="";
+    document.getElementById("tituloFormAcordo").textContent="Cadastro de Acordos";
+    document.getElementById("btnSalvarAcordo").textContent="Salvar Acordo";
+    document.getElementById("btnCancelarAcordo").style.display="none";
   }
 
   const CSV_ALIASES = {
