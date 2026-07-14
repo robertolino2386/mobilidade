@@ -223,6 +223,33 @@
         <button type="button" id="btnUltimaRelatorio" onclick="irParaPaginaRelatorio('ultima')">Última</button>
       </div>
     </section>
+
+    <section class="card">
+      <div class="table-topbar">
+        <div>
+          <h2 style="margin-bottom:8px">Corridas de cooperativas</h2>
+          <div id="contadorCooperativas" class="counter">0 registros</div>
+        </div>
+        <div class="search-box">
+          <label for="filtroCooperativas">Pesquisar nas cooperativas</label>
+          <input type="text" id="filtroCooperativas" placeholder="Parceiro, colaborador, empresa, BKO..." oninput="filtrarCooperativas()">
+        </div>
+      </div>
+      <p class="hint">Exibe as corridas cujo parceiro não seja <strong>Uber</strong> nem <strong>99</strong>.</p>
+      <div class="table-wrap">
+        <table>
+          <thead id="cabecalhoCooperativas"></thead>
+          <tbody id="corpoCooperativas"><tr><td>Atualize o relatório para iniciar.</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button type="button" id="btnPrimeiraCooperativas" onclick="irParaPaginaCooperativas('primeira')">Primeira</button>
+        <button type="button" id="btnAnteriorCooperativas" onclick="mudarPaginaCooperativas(-1)">Anterior</button>
+        <span id="infoPaginaCooperativas" class="counter">Página 1</span>
+        <button type="button" id="btnProximaCooperativas" onclick="mudarPaginaCooperativas(1)">Próxima</button>
+        <button type="button" id="btnUltimaCooperativas" onclick="irParaPaginaCooperativas('ultima')">Última</button>
+      </div>
+    </section>
   </div>
 
 
@@ -299,6 +326,10 @@
   let relatorioFiltrado = [];
   let paginaRelatorio = 1;
   const itensPorPaginaRelatorio = 20;
+  let cooperativasCache = [];
+  let cooperativasFiltradas = [];
+  let paginaCooperativas = 1;
+  const itensPorPaginaCooperativas = 20;
 
   document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => abrirAba(btn.dataset.tab)));
 
@@ -612,13 +643,17 @@
       const retorno=await getJson("listarRelatorioPendentes");
       if(!retorno.success) throw new Error(retorno.message||"Não foi possível gerar o relatório.");
       relatorioCache=Array.isArray(retorno.data)?retorno.data:[];
+      cooperativasCache=Array.isArray(retorno.cooperativas)?retorno.cooperativas:[];
       document.getElementById("totalBaseRelatorio").textContent=retorno.totalBase||0;
       document.getElementById("totalEncontradosRelatorio").textContent=retorno.totalEncontrados||0;
       document.getElementById("totalPendentesRelatorio").textContent=retorno.totalPendentes||0;
-      document.getElementById("contadorRelatorio").textContent=`Comparação concluída: ${retorno.totalPendentes||0} ID(s) não encontrado(s).`;
+      document.getElementById("contadorRelatorio").textContent=`Comparação concluída: ${retorno.totalPendentes||0} ID(s) não encontrado(s). BKO 8741 desconsiderado.`;
       document.getElementById("cabecalhoRelatorio").innerHTML="<tr>"+BASE_HEADERS.map(h=>`<th>${escapeHtml(h)}</th>`).join("")+"</tr>";
+      document.getElementById("cabecalhoCooperativas").innerHTML="<tr>"+BASE_HEADERS.map(h=>`<th>${escapeHtml(h)}</th>`).join("")+"</tr>";
       paginaRelatorio=1;
+      paginaCooperativas=1;
       filtrarRelatorio();
+      filtrarCooperativas();
       mostrarMensagem("mensagemRelatorio","Relatório atualizado com sucesso.","success");
     }catch(erro){
       relatorioCache=[];
@@ -657,6 +692,38 @@
     const totalPaginas=Math.max(1,Math.ceil(relatorioFiltrado.length/itensPorPaginaRelatorio));
     paginaRelatorio=destino==="ultima"?totalPaginas:1;
     renderizarRelatorio();
+  }
+
+  function filtrarCooperativas(){
+    const termo=normalizarBusca(valor("filtroCooperativas"));
+    cooperativasFiltradas=cooperativasCache.filter(l=>l.map(normalizarBusca).join(" ").includes(termo));
+    paginaCooperativas=1;
+    renderizarCooperativas();
+  }
+
+  function renderizarCooperativas(){
+    const totalPaginas=Math.max(1,Math.ceil(cooperativasFiltradas.length/itensPorPaginaCooperativas));
+    paginaCooperativas=Math.min(Math.max(1,paginaCooperativas),totalPaginas);
+    const inicio=(paginaCooperativas-1)*itensPorPaginaCooperativas;
+    const pagina=cooperativasFiltradas.slice(inicio,inicio+itensPorPaginaCooperativas);
+    document.getElementById("contadorCooperativas").textContent=`${cooperativasFiltradas.length} corrida(s) de cooperativa`;
+    document.getElementById("infoPaginaCooperativas").textContent=`Página ${paginaCooperativas} de ${totalPaginas}`;
+    document.getElementById("btnPrimeiraCooperativas").disabled=paginaCooperativas<=1;
+    document.getElementById("btnAnteriorCooperativas").disabled=paginaCooperativas<=1;
+    document.getElementById("btnProximaCooperativas").disabled=paginaCooperativas>=totalPaginas;
+    document.getElementById("btnUltimaCooperativas").disabled=paginaCooperativas>=totalPaginas;
+    document.getElementById("corpoCooperativas").innerHTML=pagina.length?pagina.map(l=>"<tr>"+BASE_HEADERS.map((_,i)=>`<td>${escapeHtml(l[i]??"")}</td>`).join("")+"</tr>").join(""):`<tr><td colspan="${BASE_HEADERS.length}">Nenhuma corrida de cooperativa encontrada.</td></tr>`;
+  }
+
+  function mudarPaginaCooperativas(delta){
+    paginaCooperativas+=delta;
+    renderizarCooperativas();
+  }
+
+  function irParaPaginaCooperativas(destino){
+    const totalPaginas=Math.max(1,Math.ceil(cooperativasFiltradas.length/itensPorPaginaCooperativas));
+    paginaCooperativas=destino==="ultima"?totalPaginas:1;
+    renderizarCooperativas();
   }
 
   formAcordo.addEventListener("submit", async function(event){
