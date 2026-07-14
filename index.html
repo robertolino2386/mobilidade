@@ -93,6 +93,7 @@
     <nav class="side-menu">
       <button class="tab-btn active" data-tab="clientes" type="button">Clientes</button>
       <button class="tab-btn" data-tab="importacoes" type="button">Importações</button>
+      <button class="tab-btn" data-tab="dashboard" type="button">Dashboard</button>
       <button class="tab-btn" data-tab="relatorio" type="button">Relatório</button>
       <button class="tab-btn" data-tab="acordos" type="button">Acordos</button>
     </nav>
@@ -185,6 +186,31 @@
     <section class="card preview-card" id="cardPreviaTokens" style="display:none">
       <div class="table-topbar"><div><h2 style="margin-bottom:8px">Prévia dos IDs Benner</h2><div id="contadorPreviaTokens" class="counter"></div></div></div>
       <div class="table-wrap"><table><thead id="cabecalhoPreviaTokens"></thead><tbody id="corpoPreviaTokens"></tbody></table></div>
+    </section>
+  </div>
+
+
+  <div id="tab-dashboard" class="tab-content">
+    <section class="card">
+      <div class="table-topbar">
+        <div>
+          <h2 style="margin-bottom:8px">Resumo das Corridas</h2>
+          <div id="contadorDashboard" class="counter">Carregando resumo...</div>
+        </div>
+        <div class="upload-actions" style="margin-top:0">
+          <button type="button" id="btnAtualizarDashboard" onclick="carregarDashboard()">Atualizar</button>
+        </div>
+      </div>
+      <p class="hint">O valor considera o total da corrida acrescido do percentual de FEE cadastrado para o BKO do cliente.</p>
+      <div id="mensagemDashboard" class="msg"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Mês</th><th>Ano</th><th>Qtd Corrida</th><th>Valor da Corrida + FEE</th></tr>
+          </thead>
+          <tbody id="corpoDashboard"><tr><td colspan="4">Abra o Dashboard para carregar o resumo.</td></tr></tbody>
+        </table>
+      </div>
     </section>
   </div>
 
@@ -340,6 +366,7 @@
     const titulos = {
       clientes: ["Gestão de Clientes", "Cadastro e manutenção dos clientes do produto Mobilidade."],
       importacoes: ["Importações", "Envie a Base de corridas e os IDs Benner na mesma tela."],
+      dashboard: ["Dashboard", "Resumo mensal das corridas com o valor acrescido do FEE."],
       relatorio: ["Relatório", "Comparação dos IDs da Base com os tokens do Benner."],
       acordos: ["Acordos", "Cadastro e consulta dos acordos comerciais de mobilidade."]
     };
@@ -347,6 +374,7 @@
     document.getElementById("tituloPagina").textContent = atual[0];
     document.getElementById("subtituloPagina").textContent = atual[1];
 
+    if (nome === "dashboard") carregarDashboard();
     if (nome === "relatorio") carregarRelatorio();
     if (nome === "acordos") carregarAcordos();
   }
@@ -632,6 +660,41 @@
     const totalPaginas=Math.max(1,Math.ceil(tokensFiltrados.length/itensPorPaginaTokens));
     paginaTokens=destino==="ultima"?totalPaginas:1;
     renderizarTokens();
+  }
+
+  async function carregarDashboard(){
+    const btn=document.getElementById("btnAtualizarDashboard");
+    const corpo=document.getElementById("corpoDashboard");
+    const contador=document.getElementById("contadorDashboard");
+    btn.disabled=true;
+    btn.textContent="Atualizando...";
+    contador.textContent="Calculando resumo das corridas...";
+    corpo.innerHTML='<tr><td colspan="4">Carregando...</td></tr>';
+
+    try{
+      const retorno=await getJson("listarResumoDashboard");
+      if(!retorno.success) throw new Error(retorno.message||"Não foi possível carregar o Dashboard.");
+      const linhas=Array.isArray(retorno.data)?retorno.data:[];
+      contador.textContent=`${linhas.length} período(s) | ${retorno.totalCorridas||0} corrida(s)`;
+      corpo.innerHTML=linhas.length?linhas.map(item=>`<tr>
+        <td>${escapeHtml(item.mes)}</td>
+        <td>${escapeHtml(item.ano)}</td>
+        <td>${escapeHtml(item.qtdCorridas)}</td>
+        <td>${formatarMoeda(item.valorComFee)}</td>
+      </tr>`).join(""):'<tr><td colspan="4">Nenhuma corrida com data válida foi encontrada.</td></tr>';
+    }catch(erro){
+      contador.textContent="Erro ao carregar o resumo";
+      corpo.innerHTML=`<tr><td colspan="4">${escapeHtml(erro.message)}</td></tr>`;
+      mostrarMensagem("mensagemDashboard","Erro: "+erro.message,"error");
+    }finally{
+      btn.disabled=false;
+      btn.textContent="Atualizar";
+    }
+  }
+
+  function formatarMoeda(valorNumerico){
+    const numero=Number(valorNumerico)||0;
+    return numero.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
   }
 
   async function carregarRelatorio(){
